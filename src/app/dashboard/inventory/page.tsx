@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useApp } from "@/lib/store";
-import { PageHeader, Card, CardHeader, Badge } from "@/components/ui/primitives";
+import { PageHeader, Card, CardHeader, Badge, EmptyState, HelpNote } from "@/components/ui/primitives";
 import { SpendBarChart } from "@/components/charts";
 import { useFarm } from "@/components/DataProvider";
+import { AddInventoryModal } from "@/components/AddModals";
 import { INVENTORY_LABELS } from "@/lib/i18n";
 import type { InventoryCategory } from "@/lib/types";
 import { fmtEur, fmtNum, cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ export default function InventoryPage() {
   const { lang } = useApp();
   const { inventory: INVENTORY } = useFarm();
   const [cat, setCat] = useState<(typeof CATS)[number]>("all");
+  const [add, setAdd] = useState(false);
   const items = INVENTORY.filter((i) => cat === "all" || i.category === cat);
   const low = INVENTORY.filter((i) => i.quantity <= i.low_stock_threshold);
 
@@ -29,9 +31,19 @@ export default function InventoryPage() {
     <div className="space-y-5">
       <PageHeader
         title={lang === "sq" ? "Inputet & Inventari" : "Inputs & Inventory"}
-        action={<button className="btn-primary"><Plus className="h-4 w-4" /> {lang === "sq" ? "Shto Artikull" : "Add Item"}</button>}
+        action={<button onClick={() => setAdd(true)} className="btn-primary"><Plus className="h-4 w-4" /> {lang === "sq" ? "Shto Artikull" : "Add Item"}</button>}
       />
 
+      <HelpNote>
+        {lang === "sq"
+          ? "Mbaj evidencë të farërave, plehrave, pesticideve dhe karburantit. Cakto një “prag stoku të ulët” për secilin artikull dhe AgroKos të njofton kur duhet të blesh përsëri."
+          : "Keep track of your seeds, fertilizers, pesticides and fuel. Set a “low-stock threshold” per item and AgroKos warns you when it's time to restock."}
+      </HelpNote>
+
+      {INVENTORY.length === 0 ? (
+        <EmptyState icon="📦" title={lang === "sq" ? "Inventari bosh" : "Inventory is empty"} hint={lang === "sq" ? "Shto inputin tënd të parë (farë, pleh, etj.)." : "Add your first input (seed, fertilizer, etc.)."} action={<button onClick={() => setAdd(true)} className="btn-primary"><Plus className="h-4 w-4" /> {lang === "sq" ? "Shto Artikull" : "Add Item"}</button>} />
+      ) : (
+      <>
       {low.length > 0 && (
         <div className="flex items-center gap-2 rounded-card border-l-4 border-brand-amber bg-brand-amber/10 p-3 text-sm text-[#9a6a05]">
           <AlertTriangle className="h-4 w-4 shrink-0" />
@@ -84,6 +96,10 @@ export default function InventoryPage() {
         <CardHeader title={lang === "sq" ? "Shpenzimet sipas kategorisë" : "Spend by category"} />
         <SpendBarChart data={spendByCat} />
       </Card>
+      </>
+      )}
+
+      <AddInventoryModal open={add} onClose={() => setAdd(false)} />
     </div>
   );
 }

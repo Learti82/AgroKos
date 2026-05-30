@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { useApp } from "@/lib/store";
-import { PageHeader, Card, EmptyState, Badge } from "@/components/ui/primitives";
+import { PageHeader, Card, EmptyState, Badge, HelpNote } from "@/components/ui/primitives";
 import { useFarm } from "@/components/DataProvider";
+import { AddActivityModal } from "@/components/AddModals";
 import { ACTIVITY_LABELS } from "@/lib/i18n";
 import { fmtFullSq, daysAgo } from "@/lib/dates";
 import { fmtEur, fmtNum } from "@/lib/utils";
@@ -14,6 +15,7 @@ export default function ActivitiesPage() {
   const { activities: ACTIVITIES, fields: FIELDS } = useFarm();
   const [type, setType] = useState("all");
   const [field, setField] = useState("all");
+  const [add, setAdd] = useState(false);
 
   const filtered = useMemo(() =>
     ACTIVITIES
@@ -50,10 +52,16 @@ export default function ActivitiesPage() {
         action={
           <div className="flex gap-2">
             <button onClick={exportCsv} className="btn-secondary"><Download className="h-4 w-4" /> CSV</button>
-            <button className="btn-primary"><Plus className="h-4 w-4" /> {lang === "sq" ? "Shto" : "Add"}</button>
+            <button onClick={() => setAdd(true)} className="btn-primary"><Plus className="h-4 w-4" /> {lang === "sq" ? "Shto" : "Add"}</button>
           </div>
         }
       />
+
+      <HelpNote>
+        {lang === "sq"
+          ? "Ditari i punëve regjistron çdo veprim në fermë — plehërim, spërkatje, ujitje, korrje — me koston dhe inputet e përdorura. Kjo të ndihmon të llogaritësh shpenzimet dhe fitimin real. Kliko “Shto” për të regjistruar një aktivitet."
+          : "The activity log records every farm operation — fertilizing, spraying, irrigation, harvest — with the cost and inputs used. This lets you track real spend and profit. Click “Add” to log one."}
+      </HelpNote>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
@@ -107,9 +115,11 @@ export default function ActivitiesPage() {
             })}
           </div>
         ) : (
-          <EmptyState icon="📋" title={lang === "sq" ? "Asnjë aktivitet" : "No activities"} hint={lang === "sq" ? "Provoni të ndryshoni filtrat." : "Try changing the filters."} />
+          <EmptyState icon="📋" title={lang === "sq" ? "Asnjë aktivitet ende" : "No activities yet"} hint={lang === "sq" ? "Regjistro punën e parë në fermë." : "Log your first farm task."} action={<button onClick={() => setAdd(true)} className="btn-primary"><Plus className="h-4 w-4" /> {lang === "sq" ? "Shto Aktivitet" : "Add Activity"}</button>} />
         )}
       </Card>
+
+      <AddActivityModal open={add} onClose={() => setAdd(false)} />
     </div>
   );
 }

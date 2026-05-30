@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useApp } from "@/lib/store";
-import { PageHeader, Card, CardHeader, Badge } from "@/components/ui/primitives";
+import { PageHeader, Card, CardHeader, Badge, HelpNote } from "@/components/ui/primitives";
 import { ForecastStrip } from "@/components/widgets";
 import { HourlyWeatherChart } from "@/components/charts";
 import { useWeather } from "@/lib/useWeather";
@@ -47,6 +47,12 @@ export default function WeatherPage() {
           </select>
         }
       />
+
+      <HelpNote>
+        {lang === "sq"
+          ? "Mot real i drejtpërdrejtë nga Open-Meteo për koordinatat e Kosovës. Zgjidh një fushë lart-djathtas për parashikim pikërisht për atë vendndodhje. Shenja “LIVE” do të thotë të dhëna reale; “DEMO” shfaqet vetëm nëse interneti mungon."
+          : "Live real weather from Open-Meteo for Kosovo coordinates. Pick a field (top-right) for a forecast at that exact location. A “LIVE” badge means real data; “DEMO” only appears if the internet is unavailable."}
+      </HelpNote>
 
       {/* Hero current */}
       <Card className={cn("relative overflow-hidden text-white", "bg-gradient-to-br from-brand-sky to-brand-green")}>

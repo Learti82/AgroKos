@@ -69,6 +69,15 @@ export function EmptyState({ title, hint, icon = "🌱", action }: {
   );
 }
 
+export function HelpNote({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-5 flex items-start gap-2.5 rounded-card border border-line bg-white/70 p-3.5 text-sm text-brand-charcoal/70">
+      <span className="text-base leading-none">ℹ️</span>
+      <p>{children}</p>
+    </div>
+  );
+}
+
 export function PageHeader({ title, subtitle, action }: {
   title: string;
   subtitle?: string;

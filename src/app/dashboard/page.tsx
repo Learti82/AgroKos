@@ -6,7 +6,7 @@ import { t } from "@/lib/i18n";
 import { Card, CardHeader, EmptyState, Badge } from "@/components/ui/primitives";
 import { StatCard, AlertRow, ActivityRow, ForecastStrip, MarketMini } from "@/components/widgets";
 import { CropCalendar } from "@/components/CropCalendar";
-import { FieldMap } from "@/components/FieldMap";
+import { MapView } from "@/components/MapView";
 import { useWeather } from "@/lib/useWeather";
 import {
   totalArea, activeCropsCount, activitiesThisWeek, estimatedRevenue,
@@ -53,7 +53,14 @@ export default function DashboardPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader title={t("field_overview", lang)} action={<Link href="/dashboard/fields" className="text-xs font-semibold text-brand-green hover:underline">{t("view", lang)} →</Link>} />
-          <FieldMap fields={FIELDS} className="h-56" />
+          {FIELDS.length > 0 ? (
+            <MapView fields={FIELDS} className="h-56" />
+          ) : (
+            <Link href="/dashboard/fields" className="flex h-56 flex-col items-center justify-center gap-2 rounded-card border border-dashed border-line bg-zebra text-center text-sm text-brand-charcoal/55 hover:bg-brand-lime/20">
+              <span className="text-3xl">🗺️</span>
+              {lang === "sq" ? "Shto fushën tënde të parë →" : "Add your first field →"}
+            </Link>
+          )}
         </Card>
         <Card>
           <CardHeader title={t("crop_calendar", lang)} subtitle={lang === "sq" ? "Mbjellje → korrje" : "Planting → harvest"} />

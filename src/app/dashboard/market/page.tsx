@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useApp } from "@/lib/store";
-import { PageHeader, Card, CardHeader, Badge } from "@/components/ui/primitives";
+import { PageHeader, Card, CardHeader, Badge, HelpNote } from "@/components/ui/primitives";
 import { Sparkline } from "@/components/widgets";
 import { PriceHistoryChart } from "@/components/charts";
 import { MARKET_PRICES } from "@/lib/data/demo";
@@ -34,6 +34,12 @@ export default function MarketPage() {
           </select>
         }
       />
+
+      <HelpNote>
+        {lang === "sq"
+          ? "Shënim: këto janë çmime ilustruese (jo në kohë reale) — Kosova nuk ka ende një API publike çmimesh. Shërbejnë për të treguar trendin dhe “Këshilltarin e Shitjes”. Kur të kemi një burim zyrtar, i lidhim me të dhëna reale."
+          : "Note: these are sample prices (not real-time) — Kosovo has no public price API yet. They demonstrate the trend and the “Sell Advisor”. When an official source is available we'll connect real data."}
+      </HelpNote>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2 p-0">

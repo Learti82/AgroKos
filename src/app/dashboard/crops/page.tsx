@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useApp } from "@/lib/store";
-import { PageHeader, Card, CardHeader, Badge } from "@/components/ui/primitives";
+import { PageHeader, Card, CardHeader, Badge, EmptyState, HelpNote } from "@/components/ui/primitives";
 import { CropCalendar } from "@/components/CropCalendar";
 import { CROPS, cropById, cropName } from "@/lib/data/crops";
 import { useFarm } from "@/components/DataProvider";
+import { AddPlantingModal } from "@/components/AddModals";
 import { monthNameSq } from "@/lib/dates";
 import { fmtEur, fmtNum, cn } from "@/lib/utils";
 import { fmtDateSq } from "@/lib/dates";
@@ -18,13 +19,20 @@ export default function CropsPage() {
   const { lang } = useApp();
   const { fields: FIELDS, plantings: PLANTINGS } = useFarm();
   const [tab, setTab] = useState<"plantings" | "library" | "calendar">("plantings");
+  const [add, setAdd] = useState(false);
 
   return (
     <div className="space-y-5">
       <PageHeader
         title={lang === "sq" ? "Kulturat" : "Crops"}
-        action={<button className="btn-primary"><Plus className="h-4 w-4" /> {lang === "sq" ? "Mbjellje e Re" : "New Planting"}</button>}
+        action={<button onClick={() => setAdd(true)} className="btn-primary"><Plus className="h-4 w-4" /> {lang === "sq" ? "Mbjellje e Re" : "New Planting"}</button>}
       />
+
+      <HelpNote>
+        {lang === "sq"
+          ? "“Mbjelljet” regjistrojnë çfarë ke mbjellë në secilën fushë dhe kur — me datën e pritur të korrjes. “Biblioteka” ka të dhëna për 17 kultura të Kosovës, dhe “Kalendari” i shfaq vizualisht nga mbjellja te korrja."
+          : "“Plantings” record what you sowed in each field and when — with the expected harvest date. “Library” has data for 17 Kosovo crops, and “Calendar” shows them visually from sowing to harvest."}
+      </HelpNote>
 
       <div className="flex gap-1 border-b border-line">
         {([["plantings", lang === "sq" ? "Mbjelljet e mia" : "My plantings"], ["library", lang === "sq" ? "Biblioteka" : "Library"], ["calendar", lang === "sq" ? "Kalendari" : "Calendar"]] as const).map(([id, label]) => (
@@ -32,7 +40,11 @@ export default function CropsPage() {
         ))}
       </div>
 
-      {tab === "plantings" && (
+      {tab === "plantings" && PLANTINGS.length === 0 && (
+        <EmptyState icon="🌾" title={lang === "sq" ? "Asnjë mbjellje" : "No plantings"} hint={lang === "sq" ? "Regjistro çfarë ke mbjellë në fushat e tua." : "Record what you've planted in your fields."} action={<button onClick={() => setAdd(true)} className="btn-primary"><Plus className="h-4 w-4" /> {lang === "sq" ? "Mbjellje e Re" : "New Planting"}</button>} />
+      )}
+
+      {tab === "plantings" && PLANTINGS.length > 0 && (
         <Card className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -84,9 +96,11 @@ export default function CropsPage() {
       {tab === "calendar" && (
         <Card>
           <CardHeader title={lang === "sq" ? "Kalendari vjetor i kulturave" : "Yearly crop calendar"} />
-          <CropCalendar />
+          {PLANTINGS.length > 0 ? <CropCalendar /> : <EmptyState icon="📅" title={lang === "sq" ? "Pa mbjellje për të shfaqur" : "No plantings to show"} hint={lang === "sq" ? "Shto një mbjellje për ta parë në kalendar." : "Add a planting to see it on the calendar."} />}
         </Card>
       )}
+
+      <AddPlantingModal open={add} onClose={() => setAdd(false)} />
     </div>
   );
 }

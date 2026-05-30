@@ -45,20 +45,6 @@ const toInventory = (r: any): InventoryItem => ({
   supplier: r.supplier ?? "", expiry_date: r.expiry_date, low_stock_threshold: num(r.low_stock_threshold),
 });
 
-const withUser = <T extends object>(rows: T[], user_id: string) =>
-  rows.map((r) => ({ ...r, user_id }));
-
-/** Seed a brand-new account with the Kosovo demo dataset so it isn't empty. */
-async function seedUser(sb: SupabaseClient, userId: string) {
-  const demo = demoFarmData();
-  await sb.from("fields").insert(withUser(demo.fields, userId));
-  await sb.from("plantings").insert(withUser(demo.plantings, userId));
-  await sb.from("activities").insert(withUser(demo.activities, userId));
-  await sb.from("soil_analyses").insert(withUser(demo.soils, userId));
-  await sb.from("alerts").insert(withUser(demo.alerts, userId));
-  await sb.from("inventory").insert(withUser(demo.inventory, userId));
-}
-
 async function ensureProfile(
   sb: SupabaseClient,
   userId: string,
@@ -122,16 +108,10 @@ export async function getFarmData(
   try {
     const profile = await ensureProfile(sb, userId, seed);
 
-    let { data: fields } = await sb.from("fields").select("*").eq("user_id", userId);
-
-    // First login → seed this account, then re-read.
-    if (!fields || fields.length === 0) {
-      await seedUser(sb, userId);
-      ({ data: fields } = await sb.from("fields").select("*").eq("user_id", userId));
-    }
-
-    const [{ data: plantings }, { data: activities }, { data: soils }, { data: alerts }, { data: inventory }] =
+    // Real accounts start empty — the farmer adds their own land & records.
+    const [{ data: fields }, { data: plantings }, { data: activities }, { data: soils }, { data: alerts }, { data: inventory }] =
       await Promise.all([
+        sb.from("fields").select("*").eq("user_id", userId),
         sb.from("plantings").select("*").eq("user_id", userId),
         sb.from("activities").select("*").eq("user_id", userId),
         sb.from("soil_analyses").select("*").eq("user_id", userId),

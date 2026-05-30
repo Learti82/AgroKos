@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { useApp } from "@/lib/store";
 import { Card, Badge, HealthDot, EmptyState } from "@/components/ui/primitives";
-import { FieldMap } from "@/components/FieldMap";
+import { MapView } from "@/components/MapView";
 import { ActivityRow } from "@/components/widgets";
+import { AddActivityModal } from "@/components/AddModals";
 import { SoilTrendChart } from "@/components/charts";
 import { useFarm } from "@/components/DataProvider";
+import { deleteField } from "@/app/actions/farm";
 import { cropById, cropName } from "@/lib/data/crops";
 import { SOIL_LABELS, IRRIGATION_LABELS } from "@/lib/i18n";
 import { fmtHa, fmtNum, cn } from "@/lib/utils";
 import { fmtDateSq, relativeSq, daysAgo } from "@/lib/dates";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 
 const TABS = [
   { id: "overview", sq: "Përmbledhje", en: "Overview" },
@@ -25,10 +27,19 @@ const TABS = [
 
 export default function FieldDetail({ params }: { params: { id: string } }) {
   const { lang } = useApp();
+  const router = useRouter();
   const { fields: FIELDS, activities: ACTIVITIES, plantings: PLANTINGS, soils: SOIL_ANALYSES } = useFarm();
   const [tab, setTab] = useState("overview");
+  const [addAct, setAddAct] = useState(false);
   const field = FIELDS.find((f) => f.id === params.id);
   if (!field) return notFound();
+
+  async function onDelete() {
+    if (!confirm(lang === "sq" ? "Të fshihet kjo fushë dhe të dhënat e saj?" : "Delete this field and its data?")) return;
+    const res = await deleteField(params.id);
+    if (res.ok) router.push("/dashboard/fields");
+    else alert(lang === "sq" ? "Fshirja dështoi." : "Delete failed.");
+  }
 
   const crop = cropById(field.current_crop_id);
   const acts = ACTIVITIES.filter((a) => a.field_id === field.id).sort((a, b) => +new Date(b.activity_date) - +new Date(a.activity_date));
@@ -47,10 +58,11 @@ export default function FieldDetail({ params }: { params: { id: string } }) {
           <h1 className="font-display text-2xl font-semibold text-brand-charcoal">{field.name}</h1>
           <HealthDot health={field.health} />
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge>{fmtHa(field.area_ha)}</Badge>
           <Badge tone="info">{field.municipality}</Badge>
           {crop && <Badge style={{ background: `${crop.color_hex}1a`, color: crop.color_hex }}>{crop.icon_emoji} {cropName(crop.id, lang)}</Badge>}
+          <button onClick={onDelete} className="btn-ghost px-2 py-1 text-xs text-red-600 hover:bg-red-50"><Trash2 className="h-3.5 w-3.5" /> {lang === "sq" ? "Fshi" : "Delete"}</button>
         </div>
       </div>
 
@@ -73,7 +85,7 @@ export default function FieldDetail({ params }: { params: { id: string } }) {
       {tab === "overview" && (
         <div className="grid gap-4 lg:grid-cols-3">
           <Card className="lg:col-span-2 p-0 overflow-hidden">
-            <FieldMap fields={[field]} highlightId={field.id} className="h-80" />
+            <MapView fields={[field]} highlightId={field.id} className="h-80" />
           </Card>
           <div className="space-y-3">
             {[
@@ -155,9 +167,11 @@ export default function FieldDetail({ params }: { params: { id: string } }) {
         <EmptyState icon="📷" title={lang === "sq" ? "Asnjë foto ende" : "No photos yet"} hint={lang === "sq" ? "Shto foto të fushës kur regjistron aktivitete." : "Add field photos when logging activities."} />
       )}
 
-      <button className="fixed bottom-6 right-6 z-20 inline-flex items-center gap-2 rounded-full bg-brand-green px-5 py-3 font-semibold text-white shadow-card-hover hover:bg-[#245741]">
+      <button onClick={() => setAddAct(true)} className="fixed bottom-6 right-6 z-20 inline-flex items-center gap-2 rounded-full bg-brand-green px-5 py-3 font-semibold text-white shadow-card-hover hover:bg-[#245741]">
         <Plus className="h-5 w-5" /> {lang === "sq" ? "Aktivitet" : "Activity"}
       </button>
+
+      <AddActivityModal open={addAct} onClose={() => setAddAct(false)} fieldId={field.id} />
     </div>
   );
 }

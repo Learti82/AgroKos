@@ -1,7 +1,7 @@
 "use client";
 
 import { useApp } from "@/lib/store";
-import { PageHeader, Card, CardHeader, Badge } from "@/components/ui/primitives";
+import { PageHeader, Card, CardHeader, Badge, EmptyState, HelpNote } from "@/components/ui/primitives";
 import { useWeather } from "@/lib/useWeather";
 import { useFarm } from "@/components/DataProvider";
 import { cropById, cropName } from "@/lib/data/crops";
@@ -59,6 +59,10 @@ export default function IrrigationPage() {
   return (
     <div className="space-y-5">
       <PageHeader title={lang === "sq" ? "Ujitja" : "Irrigation"} subtitle={lang === "sq" ? "Rekomandime sipas motit & kulturës" : "Recommendations by weather & crop"} />
+      {FIELDS.length === 0 ? (
+        <EmptyState icon="💧" title={lang === "sq" ? "Pa fusha për ujitje" : "No fields to irrigate"} hint={lang === "sq" ? "Shto fusha te “Fushat e Mia” për të parë rekomandimet e ujitjes." : "Add fields in “My Fields” to see irrigation recommendations."} />
+      ) : (
+      <>
       <Card className="flex items-center gap-3 bg-brand-sky/5">
         <Droplets className="h-8 w-8 text-brand-sky" />
         <p className="text-sm text-brand-charcoal/70">{lang === "sq" ? "Rekomandimet bazohen në shiun e parashikuar 7-ditor dhe nevojën për ujë të kulturës. Ujitni herët në mëngjes për efikasitet maksimal." : "Recommendations use the 7-day rain forecast and crop water needs. Irrigate early morning for maximum efficiency."}</p>
@@ -66,6 +70,8 @@ export default function IrrigationPage() {
       <div className="grid gap-4 lg:grid-cols-3">
         {FIELDS.map((f) => <FieldIrrigation key={f.id} fieldId={f.id} />)}
       </div>
+      </>
+      )}
     </div>
   );
 }
