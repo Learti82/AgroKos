@@ -7,14 +7,17 @@ import { useWeather } from "@/lib/useWeather";
 import { wmo } from "@/lib/weather";
 import { Gauge } from "@/components/Gauge";
 import { LangToggle } from "@/components/LangToggle";
-import { DEMO_PROFILE, ALERTS, WEATHER_GRID } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
+import { ClerkUser } from "@/components/ClerkUser";
+import { WEATHER_GRID } from "@/lib/data/demo";
 import { t } from "@/lib/i18n";
 
 export function Topbar({ healthScore }: { healthScore: number }) {
   const { lang, setSidebarOpen } = useApp();
-  const home = WEATHER_GRID.find((m) => m.name === DEMO_PROFILE.municipality) ?? WEATHER_GRID[0];
+  const { profile, alerts } = useFarm();
+  const home = WEATHER_GRID.find((m) => m.name === profile.municipality) ?? WEATHER_GRID[0];
   const { data } = useWeather(home.lat, home.lon);
-  const unread = ALERTS.filter((a) => !a.is_read).length;
+  const unread = alerts.filter((a) => !a.is_read).length;
   const cond = data ? wmo(data.current.code) : null;
 
   return (
@@ -27,7 +30,7 @@ export function Topbar({ healthScore }: { healthScore: number }) {
         <Gauge value={healthScore} label="OK" />
         <div className="hidden sm:block">
           <p className="text-xs text-brand-charcoal/55">{t("farm_health", lang)}</p>
-          <p className="text-sm font-semibold text-brand-charcoal">{DEMO_PROFILE.full_name}</p>
+          <p className="text-sm font-semibold text-brand-charcoal">{profile.full_name}</p>
         </div>
       </div>
 
@@ -56,6 +59,7 @@ export function Topbar({ healthScore }: { healthScore: number }) {
         </Link>
 
         <LangToggle />
+        <ClerkUser />
       </div>
     </header>
   );

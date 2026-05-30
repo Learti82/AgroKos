@@ -3,7 +3,7 @@
 import { useApp } from "@/lib/store";
 import { PageHeader, Card, CardHeader, Badge } from "@/components/ui/primitives";
 import { useWeather } from "@/lib/useWeather";
-import { FIELDS } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
 import { cropById, cropName } from "@/lib/data/crops";
 import { IRRIGATION_LABELS } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,8 @@ const WATER_NEED = { low: 1, medium: 2, high: 3 };
 
 function FieldIrrigation({ fieldId }: { fieldId: string }) {
   const { lang } = useApp();
-  const f = FIELDS.find((x) => x.id === fieldId)!;
+  const { fields } = useFarm();
+  const f = fields.find((x) => x.id === fieldId)!;
   const { data } = useWeather(f.latitude, f.longitude);
   const crop = cropById(f.current_crop_id);
   const rain7 = data ? data.daily.reduce((s, d) => s + d.rain, 0) : 0;
@@ -54,6 +55,7 @@ function Bar({ label, value, max, unit, color }: { label: string; value: number;
 
 export default function IrrigationPage() {
   const { lang } = useApp();
+  const { fields: FIELDS } = useFarm();
   return (
     <div className="space-y-5">
       <PageHeader title={lang === "sq" ? "Ujitja" : "Irrigation"} subtitle={lang === "sq" ? "Rekomandime sipas motit & kulturës" : "Recommendations by weather & crop"} />

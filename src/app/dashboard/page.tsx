@@ -11,14 +11,15 @@ import { useWeather } from "@/lib/useWeather";
 import {
   totalArea, activeCropsCount, activitiesThisWeek, estimatedRevenue,
 } from "@/lib/metrics";
-import {
-  FIELDS, ACTIVITIES, ALERTS, INVENTORY, DEMO_PROFILE, WEATHER_GRID,
-} from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
+import { WEATHER_GRID } from "@/lib/data/demo";
 import { fmtHa, fmtEur, fmtNum } from "@/lib/utils";
 
 export default function DashboardPage() {
   const { lang } = useApp();
-  const home = WEATHER_GRID.find((m) => m.name === DEMO_PROFILE.municipality) ?? WEATHER_GRID[0];
+  const farm = useFarm();
+  const { fields: FIELDS, activities: ACTIVITIES, alerts: ALERTS, inventory: INVENTORY, profile } = farm;
+  const home = WEATHER_GRID.find((m) => m.name === profile.municipality) ?? WEATHER_GRID[0];
   const { data: weather } = useWeather(home.lat, home.lon);
 
   const alerts = [...ALERTS].sort((a, b) => +new Date(b.triggered_at) - +new Date(a.triggered_at)).slice(0, 4);
@@ -32,20 +33,20 @@ export default function DashboardPage() {
     <div className="space-y-5">
       <div>
         <h1 className="font-display text-2xl font-semibold text-brand-charcoal">
-          {t(greet, lang)}, {DEMO_PROFILE.full_name.split(" ")[0]} 🌿
+          {t(greet, lang)}, {profile.full_name.split(" ")[0]} 🌿
         </h1>
         <p className="text-sm text-brand-charcoal/55">
-          {DEMO_PROFILE.village}, {DEMO_PROFILE.municipality} ·{" "}
+          {profile.village}, {profile.municipality} ·{" "}
           {lang === "sq" ? "Ja gjendja e fermës sot" : "Here's your farm today"}
         </p>
       </div>
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard icon="🗺️" color="#2D6A4F" label={t("total_area", lang)} value={fmtHa(totalArea())} sub={`${FIELDS.length} ${lang === "sq" ? "fusha" : "fields"}`} />
-        <StatCard icon="🌾" color="#E9A319" label={t("active_crops", lang)} value={String(activeCropsCount())} sub={lang === "sq" ? "mbjellje aktive" : "active plantings"} />
-        <StatCard icon="📋" color="#1A759F" label={t("activities_week", lang)} value={String(activitiesThisWeek())} sub={lang === "sq" ? "7 ditët e fundit" : "last 7 days"} />
-        <StatCard icon="💶" color="#52B788" label={t("est_revenue", lang)} value={fmtEur(estimatedRevenue(), 0)} sub={lang === "sq" ? "ky sezon" : "this season"} />
+        <StatCard icon="🗺️" color="#2D6A4F" label={t("total_area", lang)} value={fmtHa(totalArea(farm))} sub={`${FIELDS.length} ${lang === "sq" ? "fusha" : "fields"}`} />
+        <StatCard icon="🌾" color="#E9A319" label={t("active_crops", lang)} value={String(activeCropsCount(farm))} sub={lang === "sq" ? "mbjellje aktive" : "active plantings"} />
+        <StatCard icon="📋" color="#1A759F" label={t("activities_week", lang)} value={String(activitiesThisWeek(farm))} sub={lang === "sq" ? "7 ditët e fundit" : "last 7 days"} />
+        <StatCard icon="💶" color="#52B788" label={t("est_revenue", lang)} value={fmtEur(estimatedRevenue(farm), 0)} sub={lang === "sq" ? "ky sezon" : "this season"} />
       </div>
 
       {/* Row 2: map + calendar */}

@@ -5,7 +5,8 @@ import { useApp } from "@/lib/store";
 import { wmo, type ForecastResponse } from "@/lib/weather";
 import { ACTIVITY_LABELS } from "@/lib/i18n";
 import { cropById, cropName } from "@/lib/data/crops";
-import { FIELDS, MARKET_PRICES } from "@/lib/data/demo";
+import { MARKET_PRICES } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
 import type { Activity, Alert } from "@/lib/types";
 import { Badge } from "@/components/ui/primitives";
 import { fmtFullSq, weekdaySq, relativeSq, fmtDateSq } from "@/lib/dates";
@@ -35,7 +36,8 @@ const sevTone = { info: "info", warning: "warning", critical: "critical" } as co
 
 export function AlertRow({ alert }: { alert: Alert }) {
   const { lang } = useApp();
-  const field = FIELDS.find((f) => f.id === alert.field_id);
+  const { fields } = useFarm();
+  const field = fields.find((f) => f.id === alert.field_id);
   return (
     <Link
       href="/dashboard/alerts"
@@ -62,7 +64,8 @@ export function AlertRow({ alert }: { alert: Alert }) {
 
 export function ActivityRow({ a }: { a: Activity }) {
   const { lang } = useApp();
-  const field = FIELDS.find((f) => f.id === a.field_id);
+  const { fields } = useFarm();
+  const field = fields.find((f) => f.id === a.field_id);
   const meta = ACTIVITY_LABELS[a.activity_type];
   return (
     <div className="flex gap-3 py-3">

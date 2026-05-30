@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useApp } from "@/lib/store";
 import { PageHeader, Card, EmptyState, Badge } from "@/components/ui/primitives";
-import { ACTIVITIES, FIELDS } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
 import { ACTIVITY_LABELS } from "@/lib/i18n";
 import { fmtFullSq, daysAgo } from "@/lib/dates";
 import { fmtEur, fmtNum } from "@/lib/utils";
@@ -11,6 +11,7 @@ import { Download, Plus } from "lucide-react";
 
 export default function ActivitiesPage() {
   const { lang } = useApp();
+  const { activities: ACTIVITIES, fields: FIELDS } = useFarm();
   const [type, setType] = useState("all");
   const [field, setField] = useState("all");
 
@@ -19,7 +20,7 @@ export default function ActivitiesPage() {
       .filter((a) => type === "all" || a.activity_type === type)
       .filter((a) => field === "all" || a.field_id === field)
       .sort((a, b) => +new Date(b.activity_date) - +new Date(a.activity_date)),
-    [type, field]
+    [type, field, ACTIVITIES]
   );
 
   const thisMonth = ACTIVITIES.filter((a) => daysAgo(a.activity_date) <= 30);

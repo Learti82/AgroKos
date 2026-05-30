@@ -5,7 +5,7 @@ import { useApp } from "@/lib/store";
 import { PageHeader, Card, CardHeader, Badge } from "@/components/ui/primitives";
 import { CropCalendar } from "@/components/CropCalendar";
 import { CROPS, cropById, cropName } from "@/lib/data/crops";
-import { PLANTINGS, FIELDS } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
 import { monthNameSq } from "@/lib/dates";
 import { fmtEur, fmtNum, cn } from "@/lib/utils";
 import { fmtDateSq } from "@/lib/dates";
@@ -16,6 +16,7 @@ const CATEGORY = { cereal: { sq: "Drithëra", en: "Cereal" }, vegetable: { sq: "
 
 export default function CropsPage() {
   const { lang } = useApp();
+  const { fields: FIELDS, plantings: PLANTINGS } = useFarm();
   const [tab, setTab] = useState<"plantings" | "library" | "calendar">("plantings");
 
   return (

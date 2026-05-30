@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useApp } from "@/lib/store";
 import { PageHeader, Card, CardHeader, Badge } from "@/components/ui/primitives";
 import { SoilComparisonChart } from "@/components/charts";
-import { SOIL_ANALYSES, FIELDS } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
 import { soilRecommendations, SOIL_IDEALS } from "@/lib/soilAdvice";
 import { fmtDateSq } from "@/lib/dates";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ import { Plus } from "lucide-react";
 
 export default function SoilPage() {
   const { lang } = useApp();
+  const { soils: SOIL_ANALYSES, fields: FIELDS } = useFarm();
   const sorted = [...SOIL_ANALYSES].sort((a, b) => +new Date(b.analysis_date) - +new Date(a.analysis_date));
   const [selId, setSelId] = useState(sorted[0]?.id);
   const sel = sorted.find((s) => s.id === selId) ?? sorted[0];

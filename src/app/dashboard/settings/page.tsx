@@ -3,14 +3,17 @@
 import { useApp } from "@/lib/store";
 import { PageHeader, Card, CardHeader } from "@/components/ui/primitives";
 import { LangToggle } from "@/components/LangToggle";
-import { DEMO_PROFILE, KOSOVO_MUNICIPALITIES, FIELDS, ACTIVITIES, PLANTINGS, SOIL_ANALYSES, INVENTORY } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
+import { KOSOVO_MUNICIPALITIES } from "@/lib/data/demo";
 import { Download, Trash2 } from "lucide-react";
 
 export default function SettingsPage() {
   const { lang } = useApp();
+  const farm = useFarm();
+  const DEMO_PROFILE = farm.profile;
 
   function exportData() {
-    const all = { profile: DEMO_PROFILE, fields: FIELDS, plantings: PLANTINGS, activities: ACTIVITIES, soil: SOIL_ANALYSES, inventory: INVENTORY };
+    const all = { profile: farm.profile, fields: farm.fields, plantings: farm.plantings, activities: farm.activities, soil: farm.soils, inventory: farm.inventory };
     const url = URL.createObjectURL(new Blob([JSON.stringify(all, null, 2)], { type: "application/json" }));
     const a = document.createElement("a");
     a.href = url; a.download = "agrokos-te-dhenat.json"; a.click();

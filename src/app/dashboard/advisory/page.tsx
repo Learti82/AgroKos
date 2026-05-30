@@ -6,7 +6,7 @@ import { PageHeader, Card, Badge } from "@/components/ui/primitives";
 import { CROP_GUIDES, PEST_LIBRARY, FAQ } from "@/lib/data/advisory";
 import { ROTATION_NEXT, CROP_FAMILY, SUBSIDIES, EU_EXPORT } from "@/lib/data/programs";
 import { cropById, cropName, CROPS } from "@/lib/data/crops";
-import { PLANTINGS, FIELDS } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
 import { monthNameSq } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { ChevronDown, RotateCw, Leaf, Bug, HelpCircle, BookOpen, Euro, Ship } from "lucide-react";
@@ -88,6 +88,7 @@ function Guides({ lang }: { lang: "sq" | "en" }) {
 }
 
 function Seasonal({ lang }: { lang: "sq" | "en" }) {
+  const { plantings: PLANTINGS } = useFarm();
   const month = new Date().getMonth() + 1;
   const activeCrops = [...new Set(PLANTINGS.filter((p) => p.status === "active").map((p) => p.crop_id))];
   // Simple month→task mapping per crop guide hints.

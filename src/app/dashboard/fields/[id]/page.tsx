@@ -8,7 +8,7 @@ import { Card, Badge, HealthDot, EmptyState } from "@/components/ui/primitives";
 import { FieldMap } from "@/components/FieldMap";
 import { ActivityRow } from "@/components/widgets";
 import { SoilTrendChart } from "@/components/charts";
-import { FIELDS, ACTIVITIES, PLANTINGS, SOIL_ANALYSES } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
 import { cropById, cropName } from "@/lib/data/crops";
 import { SOIL_LABELS, IRRIGATION_LABELS } from "@/lib/i18n";
 import { fmtHa, fmtNum, cn } from "@/lib/utils";
@@ -25,6 +25,7 @@ const TABS = [
 
 export default function FieldDetail({ params }: { params: { id: string } }) {
   const { lang } = useApp();
+  const { fields: FIELDS, activities: ACTIVITIES, plantings: PLANTINGS, soils: SOIL_ANALYSES } = useFarm();
   const [tab, setTab] = useState("overview");
   const field = FIELDS.find((f) => f.id === params.id);
   if (!field) return notFound();

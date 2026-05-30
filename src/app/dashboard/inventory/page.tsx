@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useApp } from "@/lib/store";
 import { PageHeader, Card, CardHeader, Badge } from "@/components/ui/primitives";
 import { SpendBarChart } from "@/components/charts";
-import { INVENTORY } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
 import { INVENTORY_LABELS } from "@/lib/i18n";
 import type { InventoryCategory } from "@/lib/types";
 import { fmtEur, fmtNum, cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ const CAT_COLORS: Record<string, string> = { seed: "#52B788", fertilizer: "#2D6A
 
 export default function InventoryPage() {
   const { lang } = useApp();
+  const { inventory: INVENTORY } = useFarm();
   const [cat, setCat] = useState<(typeof CATS)[number]>("all");
   const items = INVENTORY.filter((i) => cat === "all" || i.category === cat);
   const low = INVENTORY.filter((i) => i.quantity <= i.low_stock_threshold);

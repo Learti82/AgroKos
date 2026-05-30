@@ -8,7 +8,8 @@ import { HourlyWeatherChart } from "@/components/charts";
 import { useWeather } from "@/lib/useWeather";
 import { wmo } from "@/lib/weather";
 import { computeWeatherAlerts } from "@/lib/agriWeather";
-import { FIELDS, WEATHER_GRID, DEMO_PROFILE } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
+import { WEATHER_GRID } from "@/lib/data/demo";
 import { cn } from "@/lib/utils";
 import { Droplets, Wind, Sun, Thermometer, MapPin } from "lucide-react";
 
@@ -26,7 +27,8 @@ function GridTile({ name, lat, lon }: { name: string; lat: number; lon: number }
 
 export default function WeatherPage() {
   const { lang } = useApp();
-  const home = WEATHER_GRID.find((m) => m.name === DEMO_PROFILE.municipality) ?? WEATHER_GRID[0];
+  const { fields: FIELDS, profile } = useFarm();
+  const home = WEATHER_GRID.find((m) => m.name === profile.municipality) ?? WEATHER_GRID[0];
   const [fieldId, setFieldId] = useState<string>("home");
   const sel = fieldId === "home" ? home : (() => { const f = FIELDS.find((x) => x.id === fieldId)!; return { name: f.name, lat: f.latitude, lon: f.longitude }; })();
   const { data, loading } = useWeather(sel.lat, sel.lon);

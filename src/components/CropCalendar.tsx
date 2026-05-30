@@ -1,14 +1,15 @@
 "use client";
 
 import { useApp } from "@/lib/store";
-import { FIELDS, PLANTINGS } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
 import { cropById, cropName } from "@/lib/data/crops";
 import { monthShortSq } from "@/lib/dates";
 
 // Horizontal 12-month timeline with planting→harvest bars per active planting.
 export function CropCalendar() {
   const { lang } = useApp();
-  const rows = PLANTINGS.filter((p) => p.status === "active" || p.status === "harvested").slice(0, 6);
+  const { fields: FIELDS, plantings } = useFarm();
+  const rows = plantings.filter((p) => p.status === "active" || p.status === "harvested").slice(0, 6);
 
   const monthOf = (iso: string) => {
     const d = new Date(iso);

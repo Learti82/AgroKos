@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useApp } from "@/lib/store";
 import { PageHeader, Card, Badge, EmptyState } from "@/components/ui/primitives";
-import { ALERTS, FIELDS } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
 import { fmtFullSq, relativeSq } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { CheckCheck } from "lucide-react";
@@ -12,7 +12,8 @@ const SEV = { critical: { sq: "Kritik", en: "Critical", tone: "critical" }, warn
 
 export default function AlertsPage() {
   const { lang } = useApp();
-  const [alerts, setAlerts] = useState(ALERTS);
+  const { alerts: seedAlerts, fields: FIELDS } = useFarm();
+  const [alerts, setAlerts] = useState(seedAlerts);
   const [filter, setFilter] = useState<"all" | "critical" | "warning" | "info">("all");
 
   const shown = alerts.filter((a) => filter === "all" || a.severity === filter).sort((a, b) => +new Date(b.triggered_at) - +new Date(a.triggered_at));

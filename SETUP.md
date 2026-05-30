@@ -186,22 +186,47 @@ so it picks up the new settings.
 
 ---
 
-## Part 7 — Making it actually "live" (important) 🛠️
+## Part 7 — Going live (now built in ✅)
 
-Right now the app runs in **demo mode**: it shows seeded data and a demo login.
-Putting your keys in `.env.local` is the prerequisite, but the **code that calls
-Clerk and Supabase still needs to be added.** Specifically:
+Real **Clerk login** and **Supabase per-user data** are now wired into the app.
+Here's how to turn it on:
 
-1. Install the libraries: `@clerk/nextjs`, `@supabase/supabase-js`, `drizzle-orm`.
-2. Wrap the app in `<ClerkProvider>` and add a `middleware.ts` to protect `/dashboard`.
-3. Replace the demo auth card with Clerk's real sign-in/up components.
-4. Add the `/api/webhooks/clerk` route to create a farmer profile on sign-up.
-5. Swap the seeded data imports (from `src/lib/data/demo.ts`) for live Supabase
-   queries filtered by the logged-in user.
+### 1. Create the database tables
+Two options:
+- **If your Supabase ↔ GitHub integration is active:** it applies the migration
+  in `supabase/migrations/0001_init.sql` automatically when the branch is pushed.
+- **Manual fallback:** open Supabase → **SQL Editor → New query**, paste the
+  contents of `supabase/migrations/0001_init.sql`, click **Run**.
 
-This is a meaningful chunk of work but it's all mapped out in `README.md`.
-**Tell me when you're ready and I'll wire it all up for you** — then your real
-keys will make the app fully live with per-user data and real login.
+### 2. Make sure your keys are in `.env.local` (Parts 3–6)
+
+### 3. Restart the app
+```bash
+npm run dev
+```
+
+### What you'll see when it's live
+- Visiting the app sends you to a **real Clerk sign-up / sign-in** screen.
+- After signing up you go through onboarding, then land on your dashboard.
+- **The first time you log in, your account is automatically seeded** with the
+  Kosovo demo farm (3 fields, crops, activities, etc.) so it's never empty —
+  and from then on it's *your* data, saved in *your* Supabase database.
+- A user menu (avatar, top-right) lets you sign out.
+
+### The safety net 🛟
+If a key is missing or wrong, or the tables aren't created yet, the app
+**automatically falls back to demo mode** instead of crashing. So you can never
+end up with a broken screen — worst case you see the shared demo data and a note
+in the terminal. Check the terminal for `[AgroKos] Supabase read failed …` if
+your data isn't showing; it usually means the migration hasn't run yet.
+
+### How the pieces connect (under the hood)
+- `src/middleware.ts` — protects `/dashboard` with Clerk when configured.
+- `src/app/layout.tsx` — mounts `<ClerkProvider>` only when keys are present.
+- `src/lib/supabase/server.ts` — server-only Supabase client (service-role key).
+- `src/lib/data/repository.ts` — reads your data, seeds new accounts, falls back to demo.
+- `src/components/DataProvider.tsx` — feeds your data to every dashboard page.
+- `src/app/api/webhooks/clerk/route.ts` — creates your profile on sign-up (production).
 
 ---
 

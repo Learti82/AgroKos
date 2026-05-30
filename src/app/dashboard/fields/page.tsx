@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useApp } from "@/lib/store";
 import { PageHeader, Card, Badge, HealthDot } from "@/components/ui/primitives";
 import { FieldMap } from "@/components/FieldMap";
-import { FIELDS, ACTIVITIES } from "@/lib/data/demo";
+import { useFarm } from "@/components/DataProvider";
 import { cropById, cropName } from "@/lib/data/crops";
 import { SOIL_LABELS, IRRIGATION_LABELS } from "@/lib/i18n";
 import { fmtHa } from "@/lib/utils";
@@ -14,6 +14,7 @@ import { Map, LayoutGrid, Plus, ArrowRight } from "lucide-react";
 
 export default function FieldsPage() {
   const { lang } = useApp();
+  const { fields: FIELDS, activities: ACTIVITIES } = useFarm();
   const [view, setView] = useState<"grid" | "map">("grid");
   const lastActivity = (fid: string) =>
     ACTIVITIES.filter((a) => a.field_id === fid).sort((a, b) => +new Date(b.activity_date) - +new Date(a.activity_date))[0];
