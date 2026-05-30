@@ -25,7 +25,7 @@ export default function Landing() {
     <div className="min-h-screen bg-brand-cream">
       {/* Nav */}
       <header className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 lg:px-8">
-        <Logo />
+        <Logo tagline />
         <nav className="flex items-center gap-3">
           <Link href="/dashboard" className="btn-ghost hidden sm:inline-flex">Demo</Link>
           <Link href="/dashboard" className="btn-primary">
