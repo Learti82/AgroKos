@@ -7,6 +7,7 @@ import { LangToggle } from "@/components/LangToggle";
 import { useApp } from "@/lib/store";
 import { KOSOVO_MUNICIPALITIES } from "@/lib/data/demo";
 import { CROPS, cropName } from "@/lib/data/crops";
+import { saveProfile } from "@/app/actions/profile";
 import { cn } from "@/lib/utils";
 import { ArrowRight, ArrowLeft, Check } from "lucide-react";
 
@@ -15,6 +16,11 @@ export default function Onboarding() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [crops, setCrops] = useState<string[]>([]);
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [municipality, setMunicipality] = useState(KOSOVO_MUNICIPALITIES[0]);
+  const [farmSize, setFarmSize] = useState("");
+  const [busy, setBusy] = useState(false);
 
   const steps = [
     { sq: "Mirë se vini", en: "Welcome" },
@@ -22,7 +28,23 @@ export default function Onboarding() {
     { sq: "Ferma", en: "Your farm" },
     { sq: "Gjuha", en: "Language" },
   ];
-  const next = () => (step < steps.length - 1 ? setStep(step + 1) : router.push("/dashboard"));
+
+  async function next() {
+    if (step < steps.length - 1) {
+      setStep(step + 1);
+      return;
+    }
+    setBusy(true);
+    await saveProfile({
+      full_name: fullName || undefined,
+      phone: phone || undefined,
+      municipality,
+      farm_size_ha: farmSize ? Number(farmSize) : undefined,
+      primary_crops: crops,
+      language_pref: lang,
+    });
+    router.push("/dashboard");
+  }
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
@@ -52,14 +74,14 @@ export default function Onboarding() {
             )}
             {step === 1 && (
               <>
-                <div><label className="label">{lang === "sq" ? "Emri i plotë" : "Full name"}</label><input className="input" placeholder="Agron Berisha" /></div>
-                <div><label className="label">{lang === "sq" ? "Telefoni" : "Phone"}</label><input className="input" placeholder="+383 44 ..." /></div>
-                <div><label className="label">{lang === "sq" ? "Komuna" : "Municipality"}</label><select className="input">{KOSOVO_MUNICIPALITIES.map((m) => <option key={m}>{m}</option>)}</select></div>
+                <div><label className="label">{lang === "sq" ? "Emri i plotë" : "Full name"}</label><input className="input" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={lang === "sq" ? "Emri Mbiemri" : "First Last"} /></div>
+                <div><label className="label">{lang === "sq" ? "Telefoni" : "Phone"}</label><input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+383 44 ..." /></div>
+                <div><label className="label">{lang === "sq" ? "Komuna" : "Municipality"}</label><select className="input" value={municipality} onChange={(e) => setMunicipality(e.target.value)}>{KOSOVO_MUNICIPALITIES.map((m) => <option key={m}>{m}</option>)}</select></div>
               </>
             )}
             {step === 2 && (
               <>
-                <div><label className="label">{lang === "sq" ? "Madhësia e fermës (ha)" : "Farm size (ha)"}</label><input className="input" type="number" placeholder="4.6" /></div>
+                <div><label className="label">{lang === "sq" ? "Madhësia e fermës (ha)" : "Farm size (ha)"}</label><input className="input" type="number" value={farmSize} onChange={(e) => setFarmSize(e.target.value)} placeholder="4.6" /></div>
                 <div>
                   <label className="label">{lang === "sq" ? "Kulturat kryesore" : "Primary crops"}</label>
                   <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
@@ -85,7 +107,7 @@ export default function Onboarding() {
 
           <div className="mt-8 flex max-w-md items-center justify-between">
             <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className="btn-ghost"><ArrowLeft className="h-4 w-4" /> {lang === "sq" ? "Mbrapa" : "Back"}</button>
-            <button onClick={next} className="btn-primary">
+            <button onClick={next} disabled={busy} className="btn-primary">
               {step === steps.length - 1 ? (<>{lang === "sq" ? "Përfundo" : "Finish"} <Check className="h-4 w-4" /></>) : (<>{lang === "sq" ? "Vazhdo" : "Continue"} <ArrowRight className="h-4 w-4" /></>)}
             </button>
           </div>

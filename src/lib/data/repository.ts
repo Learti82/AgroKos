@@ -59,30 +59,68 @@ async function seedUser(sb: SupabaseClient, userId: string) {
   await sb.from("inventory").insert(withUser(demo.inventory, userId));
 }
 
-async function ensureProfile(sb: SupabaseClient, userId: string): Promise<FarmProfile> {
+async function ensureProfile(
+  sb: SupabaseClient,
+  userId: string,
+  seed?: Partial<FarmProfile>,
+): Promise<FarmProfile> {
   const { data } = await sb.from("farmer_profiles").select("*").eq("clerk_user_id", userId).maybeSingle();
+
+  const mapped = (r: any): FarmProfile => ({
+    full_name: r.full_name, phone: r.phone ?? "", municipality: r.municipality ?? "",
+    village: r.village ?? "", farm_size_ha: num(r.farm_size_ha),
+    primary_crops: r.primary_crops ?? [], language_pref: r.language_pref ?? "sq",
+  });
+
   if (data) {
-    return {
-      full_name: data.full_name, phone: data.phone ?? "", municipality: data.municipality ?? "",
-      village: data.village ?? "", farm_size_ha: num(data.farm_size_ha),
-      primary_crops: data.primary_crops ?? [], language_pref: data.language_pref ?? "sq",
-    };
+    // Repair rows created before real identities were wired up: any profile
+    // still carrying the demo placeholder is overwritten with the real user.
+    if (data.full_name === "Agron Berisha") {
+      const fresh: FarmProfile = {
+        full_name: seed?.full_name || "Fermer i ri",
+        phone: seed?.phone ?? "",
+        municipality: seed?.municipality ?? "",
+        village: seed?.village ?? "",
+        farm_size_ha: seed?.farm_size_ha ?? 0,
+        primary_crops: seed?.primary_crops ?? [],
+        language_pref: data.language_pref ?? "sq",
+      };
+      await sb.from("farmer_profiles")
+        .update({ ...fresh, updated_at: new Date().toISOString() })
+        .eq("clerk_user_id", userId);
+      return fresh;
+    }
+    return mapped(data);
   }
-  const demo = demoFarmData().profile;
-  await sb.from("farmer_profiles").insert({ clerk_user_id: userId, ...demo });
-  return demo;
+
+  // Brand-new account: create from the real Clerk identity, not demo data.
+  const profile: FarmProfile = {
+    full_name: seed?.full_name || "Fermer i ri",
+    phone: seed?.phone ?? "",
+    municipality: seed?.municipality ?? "",
+    village: seed?.village ?? "",
+    farm_size_ha: seed?.farm_size_ha ?? 0,
+    primary_crops: seed?.primary_crops ?? [],
+    language_pref: "sq",
+  };
+  await sb.from("farmer_profiles").insert({ clerk_user_id: userId, ...profile });
+  return profile;
 }
 
 /**
  * Load a farmer's complete dataset. Tries the database; on missing config OR
  * any error, returns the seeded demo data so the UI never breaks.
+ * `seed` carries the real identity (name/phone) from Clerk for new accounts.
  */
-export async function getFarmData(userId: string | null): Promise<FarmData> {
+export async function getFarmData(
+  userId: string | null,
+  seed?: Partial<FarmProfile>,
+): Promise<FarmData> {
   const sb = supabaseAdmin();
   if (!sb || !userId || userId === DEMO_USER_ID) return demoFarmData();
 
   try {
-    const profile = await ensureProfile(sb, userId);
+    const profile = await ensureProfile(sb, userId, seed);
 
     let { data: fields } = await sb.from("fields").select("*").eq("user_id", userId);
 

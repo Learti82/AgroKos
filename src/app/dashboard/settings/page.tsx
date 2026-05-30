@@ -1,16 +1,38 @@
 "use client";
 
+import { useState } from "react";
 import { useApp } from "@/lib/store";
 import { PageHeader, Card, CardHeader } from "@/components/ui/primitives";
 import { LangToggle } from "@/components/LangToggle";
 import { useFarm } from "@/components/DataProvider";
 import { KOSOVO_MUNICIPALITIES } from "@/lib/data/demo";
-import { Download, Trash2 } from "lucide-react";
+import { saveProfile } from "@/app/actions/profile";
+import { Download, Trash2, Check, Loader2 } from "lucide-react";
 
 export default function SettingsPage() {
   const { lang } = useApp();
   const farm = useFarm();
-  const DEMO_PROFILE = farm.profile;
+  const p = farm.profile;
+
+  const [fullName, setFullName] = useState(p.full_name);
+  const [phone, setPhone] = useState(p.phone);
+  const [municipality, setMunicipality] = useState(p.municipality || KOSOVO_MUNICIPALITIES[0]);
+  const [village, setVillage] = useState(p.village);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  async function onSave() {
+    setSaving(true);
+    setSaved(false);
+    const res = await saveProfile({ full_name: fullName, phone, municipality, village });
+    setSaving(false);
+    if (res.ok) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } else {
+      alert(lang === "sq" ? "Ruajtja kërkon hyrje (Clerk + Supabase)." : "Saving requires login (Clerk + Supabase).");
+    }
+  }
 
   function exportData() {
     const all = { profile: farm.profile, fields: farm.fields, plantings: farm.plantings, activities: farm.activities, soil: farm.soils, inventory: farm.inventory };
@@ -27,14 +49,17 @@ export default function SettingsPage() {
       <Card>
         <CardHeader title={lang === "sq" ? "Profili" : "Profile"} />
         <div className="grid gap-4 sm:grid-cols-2">
-          <div><label className="label">{lang === "sq" ? "Emri i plotë" : "Full name"}</label><input className="input" defaultValue={DEMO_PROFILE.full_name} /></div>
-          <div><label className="label">{lang === "sq" ? "Telefoni" : "Phone"}</label><input className="input" defaultValue={DEMO_PROFILE.phone} /></div>
+          <div><label className="label">{lang === "sq" ? "Emri i plotë" : "Full name"}</label><input className="input" value={fullName} onChange={(e) => setFullName(e.target.value)} /></div>
+          <div><label className="label">{lang === "sq" ? "Telefoni" : "Phone"}</label><input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+383 ..." /></div>
           <div><label className="label">{lang === "sq" ? "Komuna" : "Municipality"}</label>
-            <select className="input" defaultValue={DEMO_PROFILE.municipality}>{KOSOVO_MUNICIPALITIES.map((m) => <option key={m}>{m}</option>)}</select>
+            <select className="input" value={municipality} onChange={(e) => setMunicipality(e.target.value)}>{KOSOVO_MUNICIPALITIES.map((m) => <option key={m}>{m}</option>)}</select>
           </div>
-          <div><label className="label">{lang === "sq" ? "Fshati" : "Village"}</label><input className="input" defaultValue={DEMO_PROFILE.village} /></div>
+          <div><label className="label">{lang === "sq" ? "Fshati" : "Village"}</label><input className="input" value={village} onChange={(e) => setVillage(e.target.value)} /></div>
         </div>
-        <button className="btn-primary mt-4">{lang === "sq" ? "Ruaj ndryshimet" : "Save changes"}</button>
+        <button onClick={onSave} disabled={saving} className="btn-primary mt-4">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <Check className="h-4 w-4" /> : null}
+          {saved ? (lang === "sq" ? "U ruajt" : "Saved") : lang === "sq" ? "Ruaj ndryshimet" : "Save changes"}
+        </button>
       </Card>
 
       <Card>
