@@ -26,8 +26,9 @@ const config: Config = {
         card: "12px",
       },
       boxShadow: {
-        card: "0 1px 4px rgba(0,0,0,0.06)",
-        "card-hover": "0 4px 16px rgba(0,0,0,0.08)",
+        card: "0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04)",
+        "card-hover": "0 4px 20px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05)",
+        pop: "0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)",
       },
       keyframes: {
         "scroll-x": {

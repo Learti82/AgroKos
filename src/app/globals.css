@@ -19,7 +19,7 @@
   }
   body {
     @apply bg-brand-cream text-brand-charcoal antialiased;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.6;
   }
   ::selection {
@@ -30,32 +30,41 @@
 
 @layer components {
   .card {
-    @apply rounded-card border border-line bg-white shadow-card;
+    @apply rounded-card border border-line bg-white shadow-card transition-shadow duration-200;
   }
   .stat-card {
     @apply card relative overflow-hidden p-5;
     border-left-width: 4px;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50;
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold
+           transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/40
+           focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-brand-green text-white hover:bg-[#245741];
+    @apply btn bg-brand-green text-white hover:bg-[#245741] active:bg-[#1d4433];
   }
   .btn-secondary {
-    @apply btn border border-brand-green/30 bg-white text-brand-green hover:bg-brand-lime/30;
+    @apply btn border border-brand-green/30 bg-white text-brand-green
+           hover:border-brand-green/50 hover:bg-brand-lime/30;
   }
   .btn-ghost {
-    @apply btn text-brand-charcoal/70 hover:bg-black/5;
+    @apply btn text-brand-charcoal/60 hover:bg-black/5 hover:text-brand-charcoal;
   }
   .badge {
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
   .input {
-    @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none transition focus:border-brand-green-light focus:ring-2 focus:ring-brand-lime;
+    @apply w-full rounded-lg border border-line bg-white px-3 py-2.5 text-sm outline-none
+           placeholder:text-brand-charcoal/35 transition-all duration-150
+           hover:border-brand-green/30 focus:border-brand-green-light focus:ring-2 focus:ring-brand-lime/60;
   }
   .label {
-    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-brand-charcoal/60;
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-brand-charcoal/55;
+  }
+  /* sidebar section grouping label */
+  .nav-section {
+    @apply px-3 pt-5 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-white/30;
   }
 }
 
