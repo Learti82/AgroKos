@@ -98,6 +98,22 @@ export function SpendBarChart({ data }: { data: { name: string; value: number; c
   );
 }
 
+export function CashFlowChart({ data }: { data: { name: string; income: number; cost: number }[] }) {
+  return (
+    <ResponsiveContainer width="100%" height={240}>
+      <BarChart data={data} margin={{ left: -8, right: 8, top: 8 }}>
+        <CartesianGrid stroke={GRID} vertical={false} />
+        <XAxis dataKey="name" tick={AXIS} axisLine={false} tickLine={false} />
+        <YAxis tick={AXIS} axisLine={false} tickLine={false} unit="€" width={52} />
+        <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #E5EDE8", fontSize: 12 }} cursor={{ fill: "#F4FAF6" }} />
+        <Legend wrapperStyle={{ fontSize: 11 }} />
+        <Bar dataKey="income" name="Të ardhura" fill="#52B788" radius={[6, 6, 0, 0]} />
+        <Bar dataKey="cost" name="Kosto" fill="#E9A319" radius={[6, 6, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
 export function SoilComparisonChart({ data }: { data: { name: string; value: number; ideal: number }[] }) {
   return (
     <ResponsiveContainer width="100%" height={220}>

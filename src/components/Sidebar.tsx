@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Map, Wheat, CloudSun, Droplets, AlertTriangle,
   TrendingUp, FlaskConical, ClipboardList, Package, HandHelping, Settings, X,
-  Sparkles, ScanLine, PiggyBank, Landmark, ListChecks, Calculator,
+  Sparkles, ScanLine, PiggyBank, Landmark, ListChecks, Calculator, Sprout, CalendarRange,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { t, type DictKey } from "@/lib/i18n";
@@ -19,11 +19,13 @@ const NAV: { href: string; key: DictKey; icon: typeof Map }[] = [
   { href: "/dashboard/diagnose", key: "nav_diagnose", icon: ScanLine },
   { href: "/dashboard/fields", key: "nav_fields", icon: Map },
   { href: "/dashboard/crops", key: "nav_crops", icon: Wheat },
+  { href: "/dashboard/harvest", key: "nav_harvest", icon: Sprout },
   { href: "/dashboard/weather", key: "nav_weather", icon: CloudSun },
   { href: "/dashboard/irrigation", key: "nav_irrigation", icon: Droplets },
   { href: "/dashboard/alerts", key: "nav_alerts", icon: AlertTriangle },
   { href: "/dashboard/market", key: "nav_market", icon: TrendingUp },
   { href: "/dashboard/profit", key: "nav_profit", icon: PiggyBank },
+  { href: "/dashboard/cashflow", key: "nav_cashflow", icon: CalendarRange },
   { href: "/dashboard/subsidies", key: "nav_subsidies", icon: Landmark },
   { href: "/dashboard/soil", key: "nav_soil", icon: FlaskConical },
   { href: "/dashboard/calculator", key: "nav_calculator", icon: Calculator },

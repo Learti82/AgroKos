@@ -21,6 +21,8 @@ export const DICT = {
   nav_subsidies: { sq: "Subvencione", en: "Subsidies" },
   nav_tasks: { sq: "Punët e Javës", en: "Tasks" },
   nav_calculator: { sq: "Llogaritësi i Plehrave", en: "Fertilizer Calc" },
+  nav_harvest: { sq: "Korrja", en: "Harvest" },
+  nav_cashflow: { sq: "Kalendari i Parave", en: "Cash-flow" },
 
   // Common
   loading: { sq: "Duke u ngarkuar…", en: "Loading…" },
