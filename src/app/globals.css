@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-green: #2d6a4f;
+  --brand-green-light: #52b788;
+  --brand-lime: #b7e4c7;
+  --brand-earth: #6b4226;
+  --brand-amber: #e9a319;
+  --brand-sky: #1a759f;
+  --brand-cream: #f8f4ef;
+  --brand-charcoal: #1c2b1e;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-brand-cream text-brand-charcoal antialiased;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  ::selection {
+    background: var(--brand-lime);
+    color: var(--brand-charcoal);
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-card border border-line bg-white shadow-card transition-shadow duration-200;
+  }
+  .stat-card {
+    @apply card relative overflow-hidden p-5;
+    border-left-width: 4px;
+  }
+  .btn {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold
+           transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/40
+           focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-brand-green text-white hover:bg-[#245741] active:bg-[#1d4433];
+  }
+  .btn-secondary {
+    @apply btn border border-brand-green/30 bg-white text-brand-green
+           hover:border-brand-green/50 hover:bg-brand-lime/30;
+  }
+  .btn-ghost {
+    @apply btn text-brand-charcoal/60 hover:bg-black/5 hover:text-brand-charcoal;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  .input {
+    @apply w-full rounded-lg border border-line bg-white px-3 py-2.5 text-sm outline-none
+           placeholder:text-brand-charcoal/35 transition-all duration-150
+           hover:border-brand-green/30 focus:border-brand-green-light focus:ring-2 focus:ring-brand-lime/60;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-brand-charcoal/55;
+  }
+  /* sidebar section grouping label */
+  .nav-section {
+    @apply px-3 pt-5 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-white/30;
+  }
+}
+
+/* Grain texture overlay used on the hero */
+.grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  @apply rounded-md bg-line/70;
+  background: linear-gradient(90deg, #e9f1ec 25%, #f4faf6 37%, #e9f1ec 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* hide scrollbars for carousels */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

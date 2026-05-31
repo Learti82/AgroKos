@@ -1,0 +1,12 @@
+{
+  "name": "AgroKos — Bujqësia e Kosovës, E Dixhitalizuar",
+  "short_name": "AgroKos",
+  "description": "Platformë agroteknologjike për fermerët e Kosovës.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#F8F4EF",
+  "theme_color": "#2D6A4F",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
