@@ -20,6 +20,7 @@ export const DICT = {
   nav_profit: { sq: "Fitimi", en: "Profit" },
   nav_subsidies: { sq: "Subvencione", en: "Subsidies" },
   nav_tasks: { sq: "Punët e Javës", en: "Tasks" },
+  nav_calculator: { sq: "Llogaritësi i Plehrave", en: "Fertilizer Calc" },
 
   // Common
   loading: { sq: "Duke u ngarkuar…", en: "Loading…" },
