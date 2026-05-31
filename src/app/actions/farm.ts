@@ -116,3 +116,29 @@ export interface NewInventory {
 export const createInventory = (i: NewInventory) =>
   insert("inventory", { expiry_date: null, low_stock_threshold: 0, purchase_price_eur: 0, ...i });
 export const deleteInventory = (id: string) => remove("inventory", id);
+
+// ── Market prices (manually entered from official sources) ─────────────
+export async function saveMarketPrices(entries: { crop_id: string; price: number }[]): Promise<Result> {
+  const { userId, sb, demo } = await ctx();
+  if (demo || !sb || !userId) return { ok: false, demo: true };
+
+  const { data: existing } = await sb.from("market_prices").select("crop_id, price_eur_kg").eq("user_id", userId);
+  const prevMap = new Map((existing ?? []).map((r: any) => [r.crop_id, Number(r.price_eur_kg)]));
+  const today = new Date().toISOString().slice(0, 10);
+
+  const rows = entries
+    .filter((e) => Number.isFinite(e.price) && e.price > 0)
+    .map((e) => ({
+      user_id: userId,
+      crop_id: e.crop_id,
+      price_eur_kg: e.price,
+      prev_price: prevMap.has(e.crop_id) ? prevMap.get(e.crop_id) : null,
+      price_date: today,
+    }));
+
+  if (!rows.length) return { ok: true };
+  const { error } = await sb.from("market_prices").upsert(rows, { onConflict: "user_id,crop_id" });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard", "layout");
+  return { ok: true };
+}

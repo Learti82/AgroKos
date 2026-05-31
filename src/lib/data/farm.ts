@@ -16,8 +16,14 @@ export interface FarmProfile {
   language_pref: "sq" | "en";
 }
 
+export interface UserPrice {
+  price: number;
+  prev: number | null;
+  date: string;
+}
+
 // Everything a logged-in farmer's dashboard needs. Per-user data lives in the
-// database; reference data (crops, market prices, advisory) stays static in code.
+// database; reference data (crops, advisory) stays static in code.
 export interface FarmData {
   source: "demo" | "live";
   profile: FarmProfile;
@@ -27,6 +33,7 @@ export interface FarmData {
   soils: SoilAnalysis[];
   alerts: Alert[];
   inventory: InventoryItem[];
+  prices: Record<string, UserPrice>; // crop_id → manually entered market price
 }
 
 /** The seeded Kosovo demo dataset — used as fallback and to seed new accounts. */
@@ -40,5 +47,6 @@ export function demoFarmData(): FarmData {
     soils: SOIL_ANALYSES,
     alerts: ALERTS,
     inventory: INVENTORY,
+    prices: {},
   };
 }

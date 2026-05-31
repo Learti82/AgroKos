@@ -109,7 +109,7 @@ export async function getFarmData(
     const profile = await ensureProfile(sb, userId, seed);
 
     // Real accounts start empty — the farmer adds their own land & records.
-    const [{ data: fields }, { data: plantings }, { data: activities }, { data: soils }, { data: alerts }, { data: inventory }] =
+    const [{ data: fields }, { data: plantings }, { data: activities }, { data: soils }, { data: alerts }, { data: inventory }, { data: prices }] =
       await Promise.all([
         sb.from("fields").select("*").eq("user_id", userId),
         sb.from("plantings").select("*").eq("user_id", userId),
@@ -117,7 +117,13 @@ export async function getFarmData(
         sb.from("soil_analyses").select("*").eq("user_id", userId),
         sb.from("alerts").select("*").eq("user_id", userId),
         sb.from("inventory").select("*").eq("user_id", userId),
+        sb.from("market_prices").select("*").eq("user_id", userId),
       ]);
+
+    const priceMap: Record<string, { price: number; prev: number | null; date: string }> = {};
+    for (const r of prices ?? []) {
+      priceMap[r.crop_id] = { price: num(r.price_eur_kg), prev: r.prev_price == null ? null : num(r.prev_price), date: r.price_date };
+    }
 
     return {
       source: "live",
@@ -128,6 +134,7 @@ export async function getFarmData(
       soils: (soils ?? []).map(toSoil),
       alerts: (alerts ?? []).map(toAlert),
       inventory: (inventory ?? []).map(toInventory),
+      prices: priceMap,
     };
   } catch (err) {
     console.warn("[AgroKos] Supabase read failed — falling back to demo data.", err);
