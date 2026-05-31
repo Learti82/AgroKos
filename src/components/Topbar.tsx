@@ -9,15 +9,17 @@ import { Gauge } from "@/components/Gauge";
 import { LangToggle } from "@/components/LangToggle";
 import { useFarm } from "@/components/DataProvider";
 import { ClerkUser } from "@/components/ClerkUser";
+import { deriveNotifications } from "@/lib/notifications";
 import { WEATHER_GRID } from "@/lib/data/demo";
 import { t } from "@/lib/i18n";
 
 export function Topbar({ healthScore }: { healthScore: number }) {
   const { lang, setSidebarOpen } = useApp();
-  const { profile, alerts } = useFarm();
+  const farm = useFarm();
+  const { profile, alerts } = farm;
   const home = WEATHER_GRID.find((m) => m.name === profile.municipality) ?? WEATHER_GRID[0];
   const { data } = useWeather(home.lat, home.lon);
-  const unread = alerts.filter((a) => !a.is_read).length;
+  const unread = alerts.filter((a) => !a.is_read).length + deriveNotifications(farm, data, lang).length;
   const cond = data ? wmo(data.current.code) : null;
 
   return (

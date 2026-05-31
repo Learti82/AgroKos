@@ -1,9 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useApp } from "@/lib/store";
 import { PageHeader, Card, Badge, EmptyState } from "@/components/ui/primitives";
 import { useFarm } from "@/components/DataProvider";
+import { useWeather } from "@/lib/useWeather";
+import { deriveNotifications } from "@/lib/notifications";
+import { WEATHER_GRID } from "@/lib/data/demo";
 import { fmtFullSq, relativeSq } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { CheckCheck } from "lucide-react";
@@ -12,7 +16,11 @@ const SEV = { critical: { sq: "Kritik", en: "Critical", tone: "critical" }, warn
 
 export default function AlertsPage() {
   const { lang } = useApp();
-  const { alerts: seedAlerts, fields: FIELDS } = useFarm();
+  const farm = useFarm();
+  const { alerts: seedAlerts, fields: FIELDS } = farm;
+  const home = WEATHER_GRID.find((m) => m.name === farm.profile.municipality) ?? WEATHER_GRID[0];
+  const { data: weather } = useWeather(home.lat, home.lon);
+  const live = deriveNotifications(farm, weather, lang);
   const [alerts, setAlerts] = useState(seedAlerts);
   const [filter, setFilter] = useState<"all" | "critical" | "warning" | "info">("all");
 
@@ -27,6 +35,26 @@ export default function AlertsPage() {
         subtitle={`${alerts.filter((a) => !a.is_read).length} ${lang === "sq" ? "të palexuara" : "unread"}`}
         action={<button onClick={markAll} className="btn-secondary"><CheckCheck className="h-4 w-4" /> {lang === "sq" ? "Lexo të gjitha" : "Mark all read"}</button>}
       />
+
+      {live.length > 0 && (
+        <div>
+          <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-brand-charcoal/70">
+            <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-green-light opacity-75" /><span className="relative inline-flex h-2 w-2 rounded-full bg-brand-green" /></span>
+            {lang === "sq" ? "Live — tani" : "Live — now"}
+          </h2>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {live.map((n) => (
+              <Link key={n.id} href={n.href} className={cn("flex items-start gap-2.5 rounded-card border-l-4 bg-white p-3 shadow-card transition hover:bg-zebra", n.severity === "critical" ? "border-red-500" : n.severity === "warning" ? "border-brand-amber" : "border-brand-sky")}>
+                <span className="text-base">{n.icon}</span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-brand-charcoal">{n.title}</p>
+                  <p className="text-xs text-brand-charcoal/60">{n.message}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2">
         {(["all", "critical", "warning", "info"] as const).map((f) => (
