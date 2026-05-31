@@ -23,6 +23,8 @@ export const DICT = {
   nav_calculator: { sq: "Llogaritësi i Plehrave", en: "Fertilizer Calc" },
   nav_harvest: { sq: "Korrja", en: "Harvest" },
   nav_cashflow: { sq: "Kalendari i Parave", en: "Cash-flow" },
+  nav_rotation: { sq: "Qarkullimi", en: "Rotation" },
+  nav_pestrisk: { sq: "Rreziku i Sëmundjeve", en: "Pest Risk" },
 
   // Common
   loading: { sq: "Duke u ngarkuar…", en: "Loading…" },
