@@ -10,7 +10,8 @@ import { saveMarketPrices } from "@/app/actions/farm";
 import { cropById, cropName, CROPS, referencePrice } from "@/lib/data/crops";
 import { fmtEur, cn } from "@/lib/utils";
 import { fmtDateSq } from "@/lib/dates";
-import { TrendingUp, TrendingDown, Minus, Pencil, Loader2 } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Pencil, Loader2, FileUp } from "lucide-react";
+import { useRef } from "react";
 
 const LOCATIONS = ["Prishtinë", "Prizren", "Pejë", "Mesatare kombëtare"];
 
@@ -19,6 +20,35 @@ export default function MarketPage() {
   const { prices } = useFarm();
   const [loc, setLoc] = useState(LOCATIONS[0]);
   const [editing, setEditing] = useState(false);
+  const [prefill, setPrefill] = useState<Record<string, string>>({});
+  const [importing, setImporting] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  async function onPdf(file: File) {
+    setImporting(true);
+    try {
+      const dataUrl: string = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result as string); r.onerror = rej; r.readAsDataURL(file); });
+      const data = dataUrl.split(",")[1];
+      const resp = await fetch("/api/import-prices", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pdf: data, mediaType: file.type || "application/pdf" }) });
+      const d = await resp.json();
+      if (d.ok && d.items?.length) {
+        const pf: Record<string, string> = {};
+        for (const it of d.items) pf[it.crop_id] = String(it.price);
+        setPrefill(pf);
+        setEditing(true);
+        alert(lang === "sq" ? `U lexuan ${d.items.length} çmime nga PDF. Kontrolloji dhe ruaji.` : `Read ${d.items.length} prices from the PDF. Review and save.`);
+      } else if (d.configured === false) {
+        alert(lang === "sq" ? "Importi me AI kërkon ANTHROPIC_API_KEY." : "AI import needs ANTHROPIC_API_KEY.");
+      } else {
+        alert(lang === "sq" ? "Nuk u gjetën çmime në PDF. Provo ta futësh me dorë." : "No prices found in the PDF. Try entering manually.");
+      }
+    } catch {
+      alert(lang === "sq" ? "Importi dështoi." : "Import failed.");
+    } finally {
+      setImporting(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
 
   const anyReal = Object.keys(prices).length > 0;
   const updated = Object.values(prices).map((p) => p.date).sort().pop();
@@ -40,10 +70,12 @@ export default function MarketPage() {
         subtitle={updated ? `${lang === "sq" ? "Përditësuar" : "Updated"}: ${fmtDateSq(updated)}` : (lang === "sq" ? "Ende pa çmime reale" : "No real prices yet")}
         action={
           <div className="flex gap-2">
-            <select className="input max-w-[170px]" value={loc} onChange={(e) => setLoc(e.target.value)}>
+            <select className="input max-w-[150px]" value={loc} onChange={(e) => setLoc(e.target.value)}>
               {LOCATIONS.map((l) => <option key={l}>{l}</option>)}
             </select>
-            <button onClick={() => setEditing(true)} className="btn-primary"><Pencil className="h-4 w-4" /> {lang === "sq" ? "Fut çmimet" : "Enter prices"}</button>
+            <input ref={fileRef} type="file" accept="application/pdf" className="hidden" onChange={(e) => e.target.files?.[0] && onPdf(e.target.files[0])} />
+            <button onClick={() => fileRef.current?.click()} disabled={importing} className="btn-secondary">{importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileUp className="h-4 w-4" />} {lang === "sq" ? "Importo PDF" : "Import PDF"}</button>
+            <button onClick={() => { setPrefill({}); setEditing(true); }} className="btn-primary"><Pencil className="h-4 w-4" /> {lang === "sq" ? "Fut çmimet" : "Enter prices"}</button>
           </div>
         }
       />
@@ -95,15 +127,15 @@ export default function MarketPage() {
         <EmptyState icon="🏷️" title={lang === "sq" ? "Fut çmimet reale" : "Enter real prices"} hint={lang === "sq" ? "Hap sitkosova.org, kopjo çmimet javore dhe futi këtu. Pastaj historiku ndërtohet vetë javë pas jave." : "Open sitkosova.org, copy the weekly prices and enter them here. History then builds week by week."} action={<button onClick={() => setEditing(true)} className="btn-primary"><Pencil className="h-4 w-4" /> {lang === "sq" ? "Fut çmimet" : "Enter prices"}</button>} />
       )}
 
-      <UpdatePricesModal open={editing} onClose={() => setEditing(false)} priceFor={(id) => prices[id]?.price ?? referencePrice(id)} />
+      <UpdatePricesModal key={Object.keys(prefill).join(",")} open={editing} onClose={() => setEditing(false)} initial={prefill} priceFor={(id) => prices[id]?.price ?? referencePrice(id)} />
     </div>
   );
 }
 
-function UpdatePricesModal({ open, onClose, priceFor }: { open: boolean; onClose: () => void; priceFor: (id: string) => number }) {
+function UpdatePricesModal({ open, onClose, priceFor, initial }: { open: boolean; onClose: () => void; priceFor: (id: string) => number; initial?: Record<string, string> }) {
   const { lang } = useApp();
   const router = useRouter();
-  const [vals, setVals] = useState<Record<string, string>>({});
+  const [vals, setVals] = useState<Record<string, string>>(initial ?? {});
   const [saving, setSaving] = useState(false);
   const get = (id: string) => (vals[id] !== undefined ? vals[id] : String(priceFor(id)));
 
