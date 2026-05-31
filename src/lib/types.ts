@@ -110,6 +110,23 @@ export interface MarketPrice {
   history: { date: string; price: number }[];
 }
 
+export interface SellListing {
+  id: string;
+  crop_id: string;
+  quantity_kg: number;
+  target_price: number; // €/kg the farmer wants
+  status: "available" | "sold";
+  notes: string;
+}
+
+export interface IncomeEntry {
+  id: string;
+  income_date: string;
+  category: "harvest" | "subsidy" | "livestock" | "other";
+  amount: number;
+  description: string;
+}
+
 export interface Animal {
   id: string;
   tag: string;          // name or ear-tag number

@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Map, Wheat, CloudSun, Droplets, AlertTriangle,
   TrendingUp, FlaskConical, ClipboardList, Package, HandHelping, Settings, X,
   Sparkles, ScanLine, PiggyBank, Landmark, ListChecks, Calculator, Sprout, CalendarRange,
-  RotateCw, Bug, Beef,
+  RotateCw, Bug, Beef, Tag, BookOpen, Contact,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { t, type DictKey } from "@/lib/i18n";
@@ -28,7 +28,9 @@ const NAV: { href: string; key: DictKey; icon: typeof Map }[] = [
   { href: "/dashboard/rotation", key: "nav_rotation", icon: RotateCw },
   { href: "/dashboard/alerts", key: "nav_alerts", icon: AlertTriangle },
   { href: "/dashboard/market", key: "nav_market", icon: TrendingUp },
+  { href: "/dashboard/sell", key: "nav_sell", icon: Tag },
   { href: "/dashboard/profit", key: "nav_profit", icon: PiggyBank },
+  { href: "/dashboard/ledger", key: "nav_ledger", icon: BookOpen },
   { href: "/dashboard/cashflow", key: "nav_cashflow", icon: CalendarRange },
   { href: "/dashboard/subsidies", key: "nav_subsidies", icon: Landmark },
   { href: "/dashboard/soil", key: "nav_soil", icon: FlaskConical },
@@ -36,6 +38,7 @@ const NAV: { href: string; key: DictKey; icon: typeof Map }[] = [
   { href: "/dashboard/activities", key: "nav_activities", icon: ClipboardList },
   { href: "/dashboard/inventory", key: "nav_inventory", icon: Package },
   { href: "/dashboard/advisory", key: "nav_advisory", icon: HandHelping },
+  { href: "/dashboard/directory", key: "nav_directory", icon: Contact },
   { href: "/dashboard/settings", key: "nav_settings", icon: Settings },
 ];
 

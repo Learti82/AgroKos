@@ -5,6 +5,7 @@ import { DEMO_USER_ID } from "@/lib/config";
 import { demoFarmData, type FarmData, type FarmProfile } from "./farm";
 import type {
   Field, Planting, Activity, SoilAnalysis, Alert, InventoryItem, Animal, MilkRecord,
+  SellListing, IncomeEntry,
 } from "@/lib/types";
 
 const num = (v: unknown, d = 0) => (v == null ? d : Number(v));
@@ -50,6 +51,13 @@ const toAnimal = (r: any): Animal => ({
 });
 const toMilk = (r: any): MilkRecord => ({
   id: r.id, animal_id: r.animal_id, record_date: r.record_date, litres: num(r.litres), notes: r.notes ?? "",
+});
+const toListing = (r: any): SellListing => ({
+  id: r.id, crop_id: r.crop_id, quantity_kg: num(r.quantity_kg), target_price: num(r.target_price),
+  status: r.status ?? "available", notes: r.notes ?? "",
+});
+const toIncome = (r: any): IncomeEntry => ({
+  id: r.id, income_date: r.income_date, category: r.category ?? "harvest", amount: num(r.amount), description: r.description ?? "",
 });
 
 async function ensureProfile(
@@ -132,6 +140,11 @@ export async function getFarmData(
       sb.from("milk_records").select("*").eq("user_id", userId),
     ]).catch(() => [{ data: [] }, { data: [] }] as any);
 
+    const [{ data: listings }, { data: incomes }] = await Promise.all([
+      sb.from("sell_listings").select("*").eq("user_id", userId),
+      sb.from("incomes").select("*").eq("user_id", userId),
+    ]).catch(() => [{ data: [] }, { data: [] }] as any);
+
     const priceMap: Record<string, { price: number; prev: number | null; date: string }> = {};
     for (const r of prices ?? []) {
       priceMap[r.crop_id] = { price: num(r.price_eur_kg), prev: r.prev_price == null ? null : num(r.prev_price), date: r.price_date };
@@ -148,6 +161,8 @@ export async function getFarmData(
       inventory: (inventory ?? []).map(toInventory),
       animals: (animals ?? []).map(toAnimal),
       milk: (milk ?? []).map(toMilk),
+      listings: (listings ?? []).map(toListing),
+      incomes: (incomes ?? []).map(toIncome),
       prices: priceMap,
     };
   } catch (err) {

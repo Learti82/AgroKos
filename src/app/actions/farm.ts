@@ -156,6 +156,17 @@ export interface NewMilk {
 export const createMilk = (m: NewMilk) => insert("milk_records", { ...m });
 export const deleteMilk = (id: string) => remove("milk_records", id);
 
+// ── Ready-to-sell listings ─────────────────────────────────────────────
+export interface NewListing { crop_id: string; quantity_kg: number; target_price: number; notes?: string; status?: string; }
+export const createListing = (l: NewListing) => insert("sell_listings", { status: "available", ...l });
+export const updateListing = (id: string, p: Partial<NewListing>) => update("sell_listings", id, { ...p });
+export const deleteListing = (id: string) => remove("sell_listings", id);
+
+// ── Income ledger ───────────────────────────────────────────────────────
+export interface NewIncome { income_date: string; category: string; amount: number; description?: string; }
+export const createIncome = (i: NewIncome) => insert("incomes", { ...i });
+export const deleteIncome = (id: string) => remove("incomes", id);
+
 // ── Market prices (manually entered from official sources) ─────────────
 export async function saveMarketPrices(entries: { crop_id: string; price: number }[]): Promise<Result> {
   const { userId, sb, demo } = await ctx();

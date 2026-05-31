@@ -13,6 +13,7 @@ import {
   createSoil, updateSoil, createPlanting, updatePlanting,
   deleteActivity, deleteInventory, deleteSoil, deletePlanting,
   createAnimal, updateAnimal, deleteAnimal, createMilk,
+  createListing, updateListing, deleteListing, createIncome,
 } from "@/app/actions/farm";
 import { Loader2, Trash2 } from "lucide-react";
 
@@ -302,6 +303,72 @@ export function LogMilkModal({ open, onClose }: { open: boolean; onClose: () => 
           </select>
         </Field>
         <Field label={lang === "sq" ? "Shënime" : "Notes"}><input className="input" value={f.notes} onChange={(e) => s("notes", e.target.value)} /></Field>
+        <SaveBar saving={saving} onClose={onClose} lang={lang} />
+      </form>
+    </Modal>
+  );
+}
+
+// ── Sell listing ─────────────────────────────────────────────────────
+export function AddListingModal({ open, onClose, editing }: { open: boolean; onClose: () => void; editing?: any }) {
+  const { saving, run, del, lang } = useSubmit(onClose);
+  const [f, setF] = useState(() => ({
+    crop_id: editing?.crop_id ?? "tomato", quantity_kg: editing?.quantity_kg ? String(editing.quantity_kg) : "",
+    target_price: editing?.target_price ? String(editing.target_price) : "", notes: editing?.notes ?? "", status: editing?.status ?? "available",
+  }));
+  const s = (k: string, v: string) => setF((p) => ({ ...p, [k]: v }));
+  const payload = () => ({ crop_id: f.crop_id, quantity_kg: Number(f.quantity_kg || 0), target_price: Number(f.target_price || 0), notes: f.notes, status: f.status });
+  return (
+    <Modal open={open} onClose={onClose} title={editing ? (lang === "sq" ? "Ndrysho Ofertën" : "Edit Listing") : (lang === "sq" ? "Vendos për Shitje" : "List for Sale")}>
+      <form onSubmit={(e) => { e.preventDefault(); run(() => editing ? updateListing(editing.id, payload()) : createListing(payload())); }} className="space-y-3">
+        <Field label={lang === "sq" ? "Kultura" : "Crop"}>
+          <select className="input" value={f.crop_id} onChange={(e) => s("crop_id", e.target.value)}>
+            {CROPS.map((c) => <option key={c.id} value={c.id}>{c.icon_emoji} {cropName(c.id, lang)}</option>)}
+          </select>
+        </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label={lang === "sq" ? "Sasia (kg)" : "Quantity (kg)"}><input type="number" step="any" className="input" value={f.quantity_kg} onChange={(e) => s("quantity_kg", e.target.value)} /></Field>
+          <Field label={lang === "sq" ? "Çmimi i synuar €/kg" : "Target price €/kg"} hint={lang === "sq" ? "Njoftohu kur tregu e arrin" : "Alert when market reaches it"}><input type="number" step="any" className="input" value={f.target_price} onChange={(e) => s("target_price", e.target.value)} /></Field>
+        </div>
+        {editing && (
+          <Field label="Status">
+            <select className="input" value={f.status} onChange={(e) => s("status", e.target.value)}>
+              <option value="available">{lang === "sq" ? "Në dispozicion" : "Available"}</option>
+              <option value="sold">{lang === "sq" ? "Shitur" : "Sold"}</option>
+            </select>
+          </Field>
+        )}
+        <Field label={lang === "sq" ? "Shënime" : "Notes"}><input className="input" value={f.notes} onChange={(e) => s("notes", e.target.value)} /></Field>
+        <SaveBar saving={saving} onClose={onClose} lang={lang} onDelete={editing ? () => del(() => deleteListing(editing.id), lang === "sq" ? "ofertën" : "listing") : undefined} />
+      </form>
+    </Modal>
+  );
+}
+
+// ── Income ───────────────────────────────────────────────────────────
+const INCOME_CATS = [
+  { id: "harvest", sq: "Shitje korrjeje", en: "Harvest sale" },
+  { id: "livestock", sq: "Bulmet / blegtori", en: "Dairy / livestock" },
+  { id: "subsidy", sq: "Subvencion", en: "Subsidy" },
+  { id: "other", sq: "Tjetër", en: "Other" },
+];
+export function AddIncomeModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { saving, run, lang } = useSubmit(onClose);
+  const [f, setF] = useState(() => ({ income_date: today(), category: "harvest", amount: "", description: "" }));
+  const s = (k: string, v: string) => setF((p) => ({ ...p, [k]: v }));
+  return (
+    <Modal open={open} onClose={onClose} title={lang === "sq" ? "Shto të Ardhur" : "Add Income"}>
+      <form onSubmit={(e) => { e.preventDefault(); if (!f.amount) return; run(() => createIncome({ income_date: f.income_date, category: f.category, amount: Number(f.amount), description: f.description })); }} className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <Field label={lang === "sq" ? "Data" : "Date"}><input type="date" className="input" value={f.income_date} onChange={(e) => s("income_date", e.target.value)} /></Field>
+          <Field label={lang === "sq" ? "Shuma €" : "Amount €"}><input type="number" step="any" className="input" value={f.amount} onChange={(e) => s("amount", e.target.value)} /></Field>
+        </div>
+        <Field label={lang === "sq" ? "Kategoria" : "Category"}>
+          <select className="input" value={f.category} onChange={(e) => s("category", e.target.value)}>
+            {INCOME_CATS.map((c) => <option key={c.id} value={c.id}>{c[lang]}</option>)}
+          </select>
+        </Field>
+        <Field label={lang === "sq" ? "Përshkrimi" : "Description"}><input className="input" value={f.description} onChange={(e) => s("description", e.target.value)} /></Field>
         <SaveBar saving={saving} onClose={onClose} lang={lang} />
       </form>
     </Modal>
