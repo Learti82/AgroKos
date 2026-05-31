@@ -167,6 +167,16 @@ export interface NewIncome { income_date: string; category: string; amount: numb
 export const createIncome = (i: NewIncome) => insert("incomes", { ...i });
 export const deleteIncome = (id: string) => remove("incomes", id);
 
+// ── Beekeeping ──────────────────────────────────────────────────────────
+export interface NewHive { name: string; location?: string; status?: string; queen_year?: number | null; notes?: string; }
+export const createHive = (h: NewHive) => insert("hives", { status: "active", ...h });
+export const updateHive = (id: string, p: Partial<NewHive>) => update("hives", id, { ...p });
+export const deleteHive = (id: string) => remove("hives", id);
+
+export interface NewHoney { hive_id: string | null; harvest_date: string; kg: number; notes?: string; }
+export const createHoney = (h: NewHoney) => insert("honey_records", { ...h });
+export const deleteHoney = (id: string) => remove("honey_records", id);
+
 // ── Market prices (manually entered from official sources) ─────────────
 export async function saveMarketPrices(entries: { crop_id: string; price: number }[]): Promise<Result> {
   const { userId, sb, demo } = await ctx();

@@ -1,6 +1,6 @@
 import type {
   Field, Planting, Activity, SoilAnalysis, Alert, InventoryItem, Animal, MilkRecord,
-  SellListing, IncomeEntry,
+  SellListing, IncomeEntry, Hive, HoneyRecord,
 } from "@/lib/types";
 import {
   DEMO_PROFILE, FIELDS, PLANTINGS, ACTIVITIES,
@@ -38,6 +38,8 @@ export interface FarmData {
   milk: MilkRecord[];
   listings: SellListing[];
   incomes: IncomeEntry[];
+  hives: Hive[];
+  honey: HoneyRecord[];
   prices: Record<string, UserPrice>; // crop_id → manually entered market price
 }
 
@@ -56,6 +58,8 @@ export function demoFarmData(): FarmData {
     milk: [],
     listings: [],
     incomes: [],
+    hives: [],
+    honey: [],
     prices: {},
   };
 }

@@ -29,6 +29,8 @@ export const DICT = {
   nav_sell: { sq: "Gati për Shitje", en: "Ready to Sell" },
   nav_ledger: { sq: "Llogaria", en: "Ledger" },
   nav_directory: { sq: "Direktoriumi", en: "Directory" },
+  nav_bees: { sq: "Bletaria", en: "Beekeeping" },
+  nav_export: { sq: "Eksporti BE", en: "EU Export" },
 
   // Common
   loading: { sq: "Duke u ngarkuar…", en: "Loading…" },

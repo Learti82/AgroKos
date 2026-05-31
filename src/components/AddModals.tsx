@@ -14,6 +14,7 @@ import {
   deleteActivity, deleteInventory, deleteSoil, deletePlanting,
   createAnimal, updateAnimal, deleteAnimal, createMilk,
   createListing, updateListing, deleteListing, createIncome,
+  createHive, updateHive, deleteHive, createHoney,
 } from "@/app/actions/farm";
 import { Loader2, Trash2 } from "lucide-react";
 
@@ -369,6 +370,63 @@ export function AddIncomeModal({ open, onClose }: { open: boolean; onClose: () =
           </select>
         </Field>
         <Field label={lang === "sq" ? "Përshkrimi" : "Description"}><input className="input" value={f.description} onChange={(e) => s("description", e.target.value)} /></Field>
+        <SaveBar saving={saving} onClose={onClose} lang={lang} />
+      </form>
+    </Modal>
+  );
+}
+
+// ── Hive ─────────────────────────────────────────────────────────────
+export function AddHiveModal({ open, onClose, editing }: { open: boolean; onClose: () => void; editing?: any }) {
+  const { saving, run, del, lang } = useSubmit(onClose);
+  const [f, setF] = useState(() => ({
+    name: editing?.name ?? "", location: editing?.location ?? "", status: editing?.status ?? "active",
+    queen_year: editing?.queen_year ? String(editing.queen_year) : "", notes: editing?.notes ?? "",
+  }));
+  const s = (k: string, v: string) => setF((p) => ({ ...p, [k]: v }));
+  const payload = () => ({ name: f.name.trim(), location: f.location, status: f.status, queen_year: f.queen_year ? Number(f.queen_year) : null, notes: f.notes });
+  return (
+    <Modal open={open} onClose={onClose} title={editing ? (lang === "sq" ? "Ndrysho Koshere" : "Edit Hive") : (lang === "sq" ? "Shto Koshere" : "Add Hive")}>
+      <form onSubmit={(e) => { e.preventDefault(); if (!f.name.trim()) return; run(() => editing ? updateHive(editing.id, payload()) : createHive(payload())); }} className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <Field label={lang === "sq" ? "Emri / Numri" : "Name / No."}><input className="input" value={f.name} onChange={(e) => s("name", e.target.value)} placeholder="#1" /></Field>
+          <Field label={lang === "sq" ? "Viti i mbretëreshës" : "Queen year"}><input type="number" className="input" value={f.queen_year} onChange={(e) => s("queen_year", e.target.value)} placeholder="2024" /></Field>
+        </div>
+        <Field label={lang === "sq" ? "Vendndodhja" : "Location"}><input className="input" value={f.location} onChange={(e) => s("location", e.target.value)} /></Field>
+        <Field label="Status">
+          <select className="input" value={f.status} onChange={(e) => s("status", e.target.value)}>
+            <option value="active">{lang === "sq" ? "Aktive" : "Active"}</option>
+            <option value="weak">{lang === "sq" ? "E dobët" : "Weak"}</option>
+            <option value="lost">{lang === "sq" ? "Humbur" : "Lost"}</option>
+          </select>
+        </Field>
+        <Field label={lang === "sq" ? "Shënime" : "Notes"}><textarea className="input" rows={2} value={f.notes} onChange={(e) => s("notes", e.target.value)} /></Field>
+        <SaveBar saving={saving} onClose={onClose} lang={lang} onDelete={editing ? () => del(() => deleteHive(editing.id), lang === "sq" ? "kosheren" : "hive") : undefined} />
+      </form>
+    </Modal>
+  );
+}
+
+// ── Honey harvest ────────────────────────────────────────────────────
+export function LogHoneyModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { hives } = useFarm();
+  const { saving, run, lang } = useSubmit(onClose);
+  const [f, setF] = useState(() => ({ hive_id: "", harvest_date: today(), kg: "", notes: "" }));
+  const s = (k: string, v: string) => setF((p) => ({ ...p, [k]: v }));
+  return (
+    <Modal open={open} onClose={onClose} title={lang === "sq" ? "Regjistro Mjaltë" : "Log Honey"}>
+      <form onSubmit={(e) => { e.preventDefault(); if (!f.kg) return; run(() => createHoney({ hive_id: f.hive_id || null, harvest_date: f.harvest_date, kg: Number(f.kg), notes: f.notes })); }} className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <Field label={lang === "sq" ? "Data" : "Date"}><input type="date" className="input" value={f.harvest_date} onChange={(e) => s("harvest_date", e.target.value)} /></Field>
+          <Field label="kg"><input type="number" step="any" className="input" value={f.kg} onChange={(e) => s("kg", e.target.value)} /></Field>
+        </div>
+        <Field label={lang === "sq" ? "Koshere (opsionale)" : "Hive (optional)"} hint={lang === "sq" ? "Lëre bosh për totalin" : "Leave blank for total"}>
+          <select className="input" value={f.hive_id} onChange={(e) => s("hive_id", e.target.value)}>
+            <option value="">{lang === "sq" ? "Të gjitha (total)" : "All (total)"}</option>
+            {hives.filter((h) => h.status !== "lost").map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
+          </select>
+        </Field>
+        <Field label={lang === "sq" ? "Shënime" : "Notes"}><input className="input" value={f.notes} onChange={(e) => s("notes", e.target.value)} /></Field>
         <SaveBar saving={saving} onClose={onClose} lang={lang} />
       </form>
     </Modal>

@@ -5,7 +5,7 @@ import { DEMO_USER_ID } from "@/lib/config";
 import { demoFarmData, type FarmData, type FarmProfile } from "./farm";
 import type {
   Field, Planting, Activity, SoilAnalysis, Alert, InventoryItem, Animal, MilkRecord,
-  SellListing, IncomeEntry,
+  SellListing, IncomeEntry, Hive, HoneyRecord,
 } from "@/lib/types";
 
 const num = (v: unknown, d = 0) => (v == null ? d : Number(v));
@@ -58,6 +58,13 @@ const toListing = (r: any): SellListing => ({
 });
 const toIncome = (r: any): IncomeEntry => ({
   id: r.id, income_date: r.income_date, category: r.category ?? "harvest", amount: num(r.amount), description: r.description ?? "",
+});
+const toHive = (r: any): Hive => ({
+  id: r.id, name: r.name, location: r.location ?? "", status: r.status ?? "active",
+  queen_year: r.queen_year == null ? null : num(r.queen_year), notes: r.notes ?? "",
+});
+const toHoney = (r: any): HoneyRecord => ({
+  id: r.id, hive_id: r.hive_id, harvest_date: r.harvest_date, kg: num(r.kg), notes: r.notes ?? "",
 });
 
 async function ensureProfile(
@@ -145,6 +152,11 @@ export async function getFarmData(
       sb.from("incomes").select("*").eq("user_id", userId),
     ]).catch(() => [{ data: [] }, { data: [] }] as any);
 
+    const [{ data: hives }, { data: honey }] = await Promise.all([
+      sb.from("hives").select("*").eq("user_id", userId),
+      sb.from("honey_records").select("*").eq("user_id", userId),
+    ]).catch(() => [{ data: [] }, { data: [] }] as any);
+
     const priceMap: Record<string, { price: number; prev: number | null; date: string }> = {};
     for (const r of prices ?? []) {
       priceMap[r.crop_id] = { price: num(r.price_eur_kg), prev: r.prev_price == null ? null : num(r.prev_price), date: r.price_date };
@@ -163,6 +175,8 @@ export async function getFarmData(
       milk: (milk ?? []).map(toMilk),
       listings: (listings ?? []).map(toListing),
       incomes: (incomes ?? []).map(toIncome),
+      hives: (hives ?? []).map(toHive),
+      honey: (honey ?? []).map(toHoney),
       prices: priceMap,
     };
   } catch (err) {

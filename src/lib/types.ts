@@ -145,6 +145,23 @@ export interface MilkRecord {
   notes: string;
 }
 
+export interface Hive {
+  id: string;
+  name: string;
+  location: string;
+  status: "active" | "weak" | "lost";
+  queen_year: number | null;
+  notes: string;
+}
+
+export interface HoneyRecord {
+  id: string;
+  hive_id: string | null;
+  harvest_date: string;
+  kg: number;
+  notes: string;
+}
+
 export type InventoryCategory =
   | "seed" | "fertilizer" | "pesticide" | "herbicide" | "equipment" | "fuel";
 
