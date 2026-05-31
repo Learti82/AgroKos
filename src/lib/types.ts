@@ -110,6 +110,24 @@ export interface MarketPrice {
   history: { date: string; price: number }[];
 }
 
+export interface Animal {
+  id: string;
+  tag: string;          // name or ear-tag number
+  species: "cow" | "goat" | "sheep";
+  breed: string;
+  birth_date: string | null;
+  status: "active" | "dry" | "sold" | "dead";
+  notes: string;
+}
+
+export interface MilkRecord {
+  id: string;
+  animal_id: string | null; // null = whole-herd total
+  record_date: string;
+  litres: number;
+  notes: string;
+}
+
 export type InventoryCategory =
   | "seed" | "fertilizer" | "pesticide" | "herbicide" | "equipment" | "fuel";
 

@@ -134,6 +134,28 @@ export const createInventory = (i: NewInventory) =>
 export const deleteInventory = (id: string) => remove("inventory", id);
 export const updateInventory = (id: string, p: Partial<NewInventory>) => update("inventory", id, { ...p });
 
+// ── Dairy / livestock ──────────────────────────────────────────────────
+export interface NewAnimal {
+  tag: string;
+  species: string;
+  breed?: string;
+  birth_date?: string | null;
+  status?: string;
+  notes?: string;
+}
+export const createAnimal = (a: NewAnimal) => insert("animals", { status: "active", ...a });
+export const updateAnimal = (id: string, p: Partial<NewAnimal>) => update("animals", id, { ...p });
+export const deleteAnimal = (id: string) => remove("animals", id);
+
+export interface NewMilk {
+  animal_id: string | null;
+  record_date: string;
+  litres: number;
+  notes?: string;
+}
+export const createMilk = (m: NewMilk) => insert("milk_records", { ...m });
+export const deleteMilk = (id: string) => remove("milk_records", id);
+
 // ── Market prices (manually entered from official sources) ─────────────
 export async function saveMarketPrices(entries: { crop_id: string; price: number }[]): Promise<Result> {
   const { userId, sb, demo } = await ctx();

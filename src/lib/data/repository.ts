@@ -4,7 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { DEMO_USER_ID } from "@/lib/config";
 import { demoFarmData, type FarmData, type FarmProfile } from "./farm";
 import type {
-  Field, Planting, Activity, SoilAnalysis, Alert, InventoryItem,
+  Field, Planting, Activity, SoilAnalysis, Alert, InventoryItem, Animal, MilkRecord,
 } from "@/lib/types";
 
 const num = (v: unknown, d = 0) => (v == null ? d : Number(v));
@@ -43,6 +43,13 @@ const toInventory = (r: any): InventoryItem => ({
   id: r.id, item_name: r.item_name, category: r.category, quantity: num(r.quantity),
   unit: r.unit, purchase_date: r.purchase_date, purchase_price_eur: num(r.purchase_price_eur),
   supplier: r.supplier ?? "", expiry_date: r.expiry_date, low_stock_threshold: num(r.low_stock_threshold),
+});
+const toAnimal = (r: any): Animal => ({
+  id: r.id, tag: r.tag, species: r.species ?? "cow", breed: r.breed ?? "",
+  birth_date: r.birth_date, status: r.status ?? "active", notes: r.notes ?? "",
+});
+const toMilk = (r: any): MilkRecord => ({
+  id: r.id, animal_id: r.animal_id, record_date: r.record_date, litres: num(r.litres), notes: r.notes ?? "",
 });
 
 async function ensureProfile(
@@ -120,6 +127,11 @@ export async function getFarmData(
         sb.from("market_prices").select("*").eq("user_id", userId),
       ]);
 
+    const [{ data: animals }, { data: milk }] = await Promise.all([
+      sb.from("animals").select("*").eq("user_id", userId),
+      sb.from("milk_records").select("*").eq("user_id", userId),
+    ]).catch(() => [{ data: [] }, { data: [] }] as any);
+
     const priceMap: Record<string, { price: number; prev: number | null; date: string }> = {};
     for (const r of prices ?? []) {
       priceMap[r.crop_id] = { price: num(r.price_eur_kg), prev: r.prev_price == null ? null : num(r.prev_price), date: r.price_date };
@@ -134,6 +146,8 @@ export async function getFarmData(
       soils: (soils ?? []).map(toSoil),
       alerts: (alerts ?? []).map(toAlert),
       inventory: (inventory ?? []).map(toInventory),
+      animals: (animals ?? []).map(toAnimal),
+      milk: (milk ?? []).map(toMilk),
       prices: priceMap,
     };
   } catch (err) {

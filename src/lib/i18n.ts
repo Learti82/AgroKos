@@ -25,6 +25,7 @@ export const DICT = {
   nav_cashflow: { sq: "Kalendari i Parave", en: "Cash-flow" },
   nav_rotation: { sq: "Qarkullimi", en: "Rotation" },
   nav_pestrisk: { sq: "Rreziku i Sëmundjeve", en: "Pest Risk" },
+  nav_dairy: { sq: "Blegtoria", en: "Livestock" },
 
   // Common
   loading: { sq: "Duke u ngarkuar…", en: "Loading…" },

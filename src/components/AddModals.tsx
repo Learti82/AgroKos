@@ -12,6 +12,7 @@ import {
   createActivity, updateActivity, createInventory, updateInventory,
   createSoil, updateSoil, createPlanting, updatePlanting,
   deleteActivity, deleteInventory, deleteSoil, deletePlanting,
+  createAnimal, updateAnimal, deleteAnimal, createMilk,
 } from "@/app/actions/farm";
 import { Loader2, Trash2 } from "lucide-react";
 
@@ -232,6 +233,76 @@ export function AddPlantingModal({ open, onClose, editing }: { open: boolean; on
         )}
         <Field label={lang === "sq" ? "Shënime" : "Notes"}><textarea className="input" rows={2} value={f.notes} onChange={(e) => s("notes", e.target.value)} /></Field>
         <SaveBar saving={saving} onClose={onClose} lang={lang} onDelete={editing ? () => del(() => deletePlanting(editing.id), lang === "sq" ? "mbjelljen" : "planting") : undefined} />
+      </form>
+    </Modal>
+  );
+}
+
+// ── Animal ───────────────────────────────────────────────────────────
+const SPECIES = [
+  { id: "cow", sq: "Lopë", en: "Cow" },
+  { id: "goat", sq: "Dhi", en: "Goat" },
+  { id: "sheep", sq: "Dele", en: "Sheep" },
+];
+export function AddAnimalModal({ open, onClose, editing }: { open: boolean; onClose: () => void; editing?: any }) {
+  const { saving, run, del, lang } = useSubmit(onClose);
+  const [f, setF] = useState(() => ({
+    tag: editing?.tag ?? "", species: editing?.species ?? "cow", breed: editing?.breed ?? "",
+    birth_date: editing?.birth_date ?? "", status: editing?.status ?? "active", notes: editing?.notes ?? "",
+  }));
+  const s = (k: string, v: string) => setF((p) => ({ ...p, [k]: v }));
+  const payload = () => ({ tag: f.tag.trim(), species: f.species, breed: f.breed, birth_date: f.birth_date || null, status: f.status, notes: f.notes });
+  return (
+    <Modal open={open} onClose={onClose} title={editing ? (lang === "sq" ? "Ndrysho Kafshën" : "Edit Animal") : (lang === "sq" ? "Shto Kafshë" : "Add Animal")}>
+      <form onSubmit={(e) => { e.preventDefault(); if (!f.tag.trim()) return; run(() => editing ? updateAnimal(editing.id, payload()) : createAnimal(payload())); }} className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <Field label={lang === "sq" ? "Emri / Numri" : "Name / Tag"}><input className="input" value={f.tag} onChange={(e) => s("tag", e.target.value)} placeholder={lang === "sq" ? "p.sh. Bardha / 042" : "e.g. Daisy / 042"} /></Field>
+          <Field label={lang === "sq" ? "Lloji" : "Species"}>
+            <select className="input" value={f.species} onChange={(e) => s("species", e.target.value)}>
+              {SPECIES.map((x) => <option key={x.id} value={x.id}>{x[lang]}</option>)}
+            </select>
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label={lang === "sq" ? "Raca" : "Breed"}><input className="input" value={f.breed} onChange={(e) => s("breed", e.target.value)} placeholder={lang === "sq" ? "Simentale" : "Simmental"} /></Field>
+          <Field label={lang === "sq" ? "Datëlindja" : "Birth date"}><input type="date" className="input" value={f.birth_date} onChange={(e) => s("birth_date", e.target.value)} /></Field>
+        </div>
+        <Field label="Status">
+          <select className="input" value={f.status} onChange={(e) => s("status", e.target.value)}>
+            <option value="active">{lang === "sq" ? "Në qumësht" : "Milking"}</option>
+            <option value="dry">{lang === "sq" ? "E thatë" : "Dry"}</option>
+            <option value="sold">{lang === "sq" ? "Shitur" : "Sold"}</option>
+            <option value="dead">{lang === "sq" ? "Ngordhur" : "Dead"}</option>
+          </select>
+        </Field>
+        <Field label={lang === "sq" ? "Shënime" : "Notes"}><textarea className="input" rows={2} value={f.notes} onChange={(e) => s("notes", e.target.value)} /></Field>
+        <SaveBar saving={saving} onClose={onClose} lang={lang} onDelete={editing ? () => del(() => deleteAnimal(editing.id), lang === "sq" ? "kafshën" : "animal") : undefined} />
+      </form>
+    </Modal>
+  );
+}
+
+// ── Milk log ─────────────────────────────────────────────────────────
+export function LogMilkModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { animals } = useFarm();
+  const { saving, run, lang } = useSubmit(onClose);
+  const [f, setF] = useState(() => ({ animal_id: "", record_date: today(), litres: "", notes: "" }));
+  const s = (k: string, v: string) => setF((p) => ({ ...p, [k]: v }));
+  return (
+    <Modal open={open} onClose={onClose} title={lang === "sq" ? "Regjistro Qumësht" : "Log Milk"}>
+      <form onSubmit={(e) => { e.preventDefault(); if (!f.litres) return; run(() => createMilk({ animal_id: f.animal_id || null, record_date: f.record_date, litres: Number(f.litres), notes: f.notes })); }} className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <Field label={lang === "sq" ? "Data" : "Date"}><input type="date" className="input" value={f.record_date} onChange={(e) => s("record_date", e.target.value)} /></Field>
+          <Field label={lang === "sq" ? "Litra" : "Litres"}><input type="number" step="any" className="input" value={f.litres} onChange={(e) => s("litres", e.target.value)} /></Field>
+        </div>
+        <Field label={lang === "sq" ? "Kafsha (opsionale)" : "Animal (optional)"} hint={lang === "sq" ? "Lëre bosh për totalin e tufës" : "Leave blank for whole-herd total"}>
+          <select className="input" value={f.animal_id} onChange={(e) => s("animal_id", e.target.value)}>
+            <option value="">{lang === "sq" ? "Tufa (total)" : "Herd (total)"}</option>
+            {animals.filter((a) => a.status === "active").map((a) => <option key={a.id} value={a.id}>{a.tag}</option>)}
+          </select>
+        </Field>
+        <Field label={lang === "sq" ? "Shënime" : "Notes"}><input className="input" value={f.notes} onChange={(e) => s("notes", e.target.value)} /></Field>
+        <SaveBar saving={saving} onClose={onClose} lang={lang} />
       </form>
     </Modal>
   );
