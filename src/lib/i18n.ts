@@ -19,6 +19,7 @@ export const DICT = {
   nav_diagnose: { sq: "Diagnoza", en: "Diagnose" },
   nav_profit: { sq: "Fitimi", en: "Profit" },
   nav_subsidies: { sq: "Subvencione", en: "Subsidies" },
+  nav_tasks: { sq: "Punët e Javës", en: "Tasks" },
 
   // Common
   loading: { sq: "Duke u ngarkuar…", en: "Loading…" },

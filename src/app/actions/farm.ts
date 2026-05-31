@@ -38,6 +38,18 @@ async function remove(table: string, id: string): Promise<Result> {
   return { ok: true };
 }
 
+async function update(table: string, id: string, patch: Record<string, unknown>): Promise<Result> {
+  const { userId, sb, demo } = await ctx();
+  if (demo || !sb || !userId) return { ok: false, demo: true };
+  const { error } = await sb.from(table).update(patch).eq("user_id", userId).eq("id", id);
+  if (error) {
+    console.warn(`[AgroKos] update ${table} failed:`, error.message);
+    return { ok: false, error: error.message };
+  }
+  revalidatePath("/dashboard", "layout");
+  return { ok: true };
+}
+
 // ── Fields ─────────────────────────────────────────────────────────────
 export interface NewField {
   name: string;
@@ -54,6 +66,7 @@ export interface NewField {
 export const createField = (f: NewField) =>
   insert("fields", { ...f, health: "good", current_crop_id: f.current_crop_id ?? null });
 export const deleteField = (id: string) => remove("fields", id);
+export const updateField = (id: string, p: Partial<NewField>) => update("fields", id, { ...p });
 
 // ── Activities ─────────────────────────────────────────────────────────
 export interface NewActivity {
@@ -70,6 +83,7 @@ export interface NewActivity {
 export const createActivity = (a: NewActivity) =>
   insert("activities", { planting_id: null, performed_by: "self", cost_eur: 0, ...a });
 export const deleteActivity = (id: string) => remove("activities", id);
+export const updateActivity = (id: string, p: Partial<NewActivity>) => update("activities", id, { ...p });
 
 // ── Plantings ──────────────────────────────────────────────────────────
 export interface NewPlanting {
@@ -84,6 +98,7 @@ export interface NewPlanting {
 export const createPlanting = (p: NewPlanting) =>
   insert("plantings", { status: "active", actual_harvest_date: null, yield_kg: null, ...p });
 export const deletePlanting = (id: string) => remove("plantings", id);
+export const updatePlanting = (id: string, p: Partial<NewPlanting & { status: string; yield_kg: number | null }>) => update("plantings", id, { ...p });
 
 // ── Soil analyses ──────────────────────────────────────────────────────
 export interface NewSoil {
@@ -100,6 +115,7 @@ export interface NewSoil {
 }
 export const createSoil = (s: NewSoil) => insert("soil_analyses", { ...s });
 export const deleteSoil = (id: string) => remove("soil_analyses", id);
+export const updateSoil = (id: string, p: Partial<NewSoil>) => update("soil_analyses", id, { ...p });
 
 // ── Inventory ──────────────────────────────────────────────────────────
 export interface NewInventory {
@@ -116,6 +132,7 @@ export interface NewInventory {
 export const createInventory = (i: NewInventory) =>
   insert("inventory", { expiry_date: null, low_stock_threshold: 0, purchase_price_eur: 0, ...i });
 export const deleteInventory = (id: string) => remove("inventory", id);
+export const updateInventory = (id: string, p: Partial<NewInventory>) => update("inventory", id, { ...p });
 
 // ── Market prices (manually entered from official sources) ─────────────
 export async function saveMarketPrices(entries: { crop_id: string; price: number }[]): Promise<Result> {

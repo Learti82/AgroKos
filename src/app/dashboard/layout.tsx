@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { Sidebar } from "@/components/Sidebar";
 import { Topbar } from "@/components/Topbar";
 import { DataProvider } from "@/components/DataProvider";
+import { SWRegister } from "@/components/SWRegister";
 import { getFarmData } from "@/lib/data/repository";
 import type { FarmProfile } from "@/lib/data/farm";
 import { farmHealthScore } from "@/lib/metrics";
@@ -34,6 +35,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <DataProvider value={data}>
+      <SWRegister />
       <div className="min-h-screen">
         <Sidebar />
         <div className="lg:pl-60">

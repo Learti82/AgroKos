@@ -10,7 +10,7 @@ import { AddPlantingModal } from "@/components/AddModals";
 import { monthNameSq } from "@/lib/dates";
 import { fmtEur, fmtNum, cn } from "@/lib/utils";
 import { fmtDateSq } from "@/lib/dates";
-import { Plus } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 
 const WATER = { low: { sq: "I ulët", en: "Low", emoji: "💧" }, medium: { sq: "Mesatar", en: "Medium", emoji: "💧💧" }, high: { sq: "I lartë", en: "High", emoji: "💧💧💧" } };
 const CATEGORY = { cereal: { sq: "Drithëra", en: "Cereal" }, vegetable: { sq: "Perime", en: "Vegetable" }, fruit: { sq: "Fruta", en: "Fruit" }, berry: { sq: "Manaferra", en: "Berry" }, dairy: { sq: "Bulmet", en: "Dairy" }, oilseed: { sq: "Vajore", en: "Oilseed" } };
@@ -20,6 +20,7 @@ export default function CropsPage() {
   const { fields: FIELDS, plantings: PLANTINGS } = useFarm();
   const [tab, setTab] = useState<"plantings" | "library" | "calendar">("plantings");
   const [add, setAdd] = useState(false);
+  const [editing, setEditing] = useState<any>(null);
 
   return (
     <div className="space-y-5">
@@ -49,7 +50,7 @@ export default function CropsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="text-left text-xs uppercase text-brand-charcoal/45">
-                {[lang === "sq" ? "Kultura" : "Crop", lang === "sq" ? "Fusha" : "Field", lang === "sq" ? "Varieteti" : "Variety", lang === "sq" ? "Mbjellë" : "Planted", lang === "sq" ? "Korrje" : "Harvest", "Status"].map((h) => <th key={h} className="px-4 py-2 font-medium">{h}</th>)}
+                {[lang === "sq" ? "Kultura" : "Crop", lang === "sq" ? "Fusha" : "Field", lang === "sq" ? "Varieteti" : "Variety", lang === "sq" ? "Mbjellë" : "Planted", lang === "sq" ? "Korrje" : "Harvest", "Status", ""].map((h, hi) => <th key={hi} className="px-4 py-2 font-medium">{h}</th>)}
               </tr></thead>
               <tbody>
                 {PLANTINGS.map((p, i) => {
@@ -63,6 +64,7 @@ export default function CropsPage() {
                       <td className="px-4 py-3 text-brand-charcoal/55">{fmtDateSq(p.planting_date)}</td>
                       <td className="px-4 py-3 text-brand-charcoal/55">{fmtDateSq(p.expected_harvest_date)}</td>
                       <td className="px-4 py-3"><Badge tone={p.status === "active" ? "good" : p.status === "harvested" ? "neutral" : "warning"}>{p.status === "active" ? (lang === "sq" ? "Aktive" : "Active") : p.status === "harvested" ? (lang === "sq" ? "Korrur" : "Harvested") : p.status}</Badge></td>
+                      <td className="px-4 py-3 text-right"><button onClick={() => setEditing(p)} className="rounded-lg p-1.5 text-brand-charcoal/40 hover:bg-zebra hover:text-brand-green" aria-label="Edit"><Pencil className="h-4 w-4" /></button></td>
                     </tr>
                   );
                 })}
@@ -100,7 +102,7 @@ export default function CropsPage() {
         </Card>
       )}
 
-      <AddPlantingModal open={add} onClose={() => setAdd(false)} />
+      <AddPlantingModal key={editing?.id ?? "new"} open={add || !!editing} editing={editing ?? undefined} onClose={() => { setAdd(false); setEditing(null); }} />
     </div>
   );
 }

@@ -9,12 +9,13 @@ import { AddSoilModal } from "@/components/AddModals";
 import { soilRecommendations, SOIL_IDEALS } from "@/lib/soilAdvice";
 import { fmtDateSq } from "@/lib/dates";
 import { cn } from "@/lib/utils";
-import { Plus } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 
 export default function SoilPage() {
   const { lang } = useApp();
   const { soils: SOIL_ANALYSES, fields: FIELDS } = useFarm();
   const [add, setAdd] = useState(false);
+  const [editing, setEditing] = useState<any>(null);
   const sorted = [...SOIL_ANALYSES].sort((a, b) => +new Date(b.analysis_date) - +new Date(a.analysis_date));
   const [selId, setSelId] = useState(sorted[0]?.id);
   const sel = sorted.find((s) => s.id === selId) ?? sorted[0];
@@ -50,13 +51,16 @@ export default function SoilPage() {
             {sorted.map((s) => {
               const f = FIELDS.find((x) => x.id === s.field_id);
               return (
-                <button key={s.id} onClick={() => setSelId(s.id)} className={cn("flex w-full items-center justify-between p-4 text-left transition hover:bg-zebra", selId === s.id && "bg-brand-lime/30")}>
+                <div key={s.id} onClick={() => setSelId(s.id)} className={cn("flex w-full cursor-pointer items-center justify-between p-4 text-left transition hover:bg-zebra", selId === s.id && "bg-brand-lime/30")}>
                   <div>
                     <p className="text-sm font-semibold text-brand-charcoal">{f?.name}</p>
                     <p className="text-xs text-brand-charcoal/50">{fmtDateSq(s.analysis_date)}</p>
                   </div>
-                  <Badge>pH {s.ph}</Badge>
-                </button>
+                  <div className="flex items-center gap-1">
+                    <Badge>pH {s.ph}</Badge>
+                    <button onClick={(e) => { e.stopPropagation(); setEditing(s); }} className="rounded-lg p-1.5 text-brand-charcoal/40 hover:text-brand-green" aria-label="Edit"><Pencil className="h-4 w-4" /></button>
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -95,7 +99,7 @@ export default function SoilPage() {
       </div>
       )}
 
-      <AddSoilModal open={add} onClose={() => setAdd(false)} />
+      <AddSoilModal key={editing?.id ?? "new"} open={add || !!editing} editing={editing ?? undefined} onClose={() => { setAdd(false); setEditing(null); }} />
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Map, Wheat, CloudSun, Droplets, AlertTriangle,
   TrendingUp, FlaskConical, ClipboardList, Package, HandHelping, Settings, X,
-  Sparkles, ScanLine, PiggyBank, Landmark,
+  Sparkles, ScanLine, PiggyBank, Landmark, ListChecks,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { t, type DictKey } from "@/lib/i18n";
@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 
 const NAV: { href: string; key: DictKey; icon: typeof Map }[] = [
   { href: "/dashboard", key: "nav_dashboard", icon: LayoutDashboard },
+  { href: "/dashboard/tasks", key: "nav_tasks", icon: ListChecks },
   { href: "/dashboard/assistant", key: "nav_assistant", icon: Sparkles },
   { href: "/dashboard/diagnose", key: "nav_diagnose", icon: ScanLine },
   { href: "/dashboard/fields", key: "nav_fields", icon: Map },

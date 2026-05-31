@@ -8,7 +8,7 @@ import { AddActivityModal } from "@/components/AddModals";
 import { ACTIVITY_LABELS } from "@/lib/i18n";
 import { fmtFullSq, daysAgo } from "@/lib/dates";
 import { fmtEur, fmtNum } from "@/lib/utils";
-import { Download, Plus } from "lucide-react";
+import { Download, Plus, Pencil } from "lucide-react";
 
 export default function ActivitiesPage() {
   const { lang } = useApp();
@@ -16,6 +16,7 @@ export default function ActivitiesPage() {
   const [type, setType] = useState("all");
   const [field, setField] = useState("all");
   const [add, setAdd] = useState(false);
+  const [editing, setEditing] = useState<any>(null);
 
   const filtered = useMemo(() =>
     ACTIVITIES
@@ -95,7 +96,7 @@ export default function ActivitiesPage() {
               const f = FIELDS.find((x) => x.id === a.field_id);
               const meta = ACTIVITY_LABELS[a.activity_type];
               return (
-                <div key={a.id} className="flex gap-3 p-4">
+                <div key={a.id} className="group flex gap-3 p-4">
                   <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-lime/50 text-lg">{meta.icon}</div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
@@ -110,6 +111,7 @@ export default function ActivitiesPage() {
                       {a.performed_by !== "self" && ` · 👤 ${a.performed_by}`}
                     </p>
                   </div>
+                  <button onClick={() => setEditing(a)} className="shrink-0 self-start rounded-lg p-2 text-brand-charcoal/40 hover:bg-zebra hover:text-brand-green" aria-label="Edit"><Pencil className="h-4 w-4" /></button>
                 </div>
               );
             })}
@@ -119,7 +121,7 @@ export default function ActivitiesPage() {
         )}
       </Card>
 
-      <AddActivityModal open={add} onClose={() => setAdd(false)} />
+      <AddActivityModal key={editing?.id ?? "new"} open={add || !!editing} editing={editing ?? undefined} onClose={() => { setAdd(false); setEditing(null); }} />
     </div>
   );
 }

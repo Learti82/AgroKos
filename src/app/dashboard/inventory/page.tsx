@@ -10,7 +10,7 @@ import { INVENTORY_LABELS } from "@/lib/i18n";
 import type { InventoryCategory } from "@/lib/types";
 import { fmtEur, fmtNum, cn } from "@/lib/utils";
 import { fmtDateSq } from "@/lib/dates";
-import { Plus, AlertTriangle } from "lucide-react";
+import { Plus, AlertTriangle, Pencil } from "lucide-react";
 
 const CATS: (InventoryCategory | "all")[] = ["all", "seed", "fertilizer", "pesticide", "herbicide", "equipment", "fuel"];
 const CAT_COLORS: Record<string, string> = { seed: "#52B788", fertilizer: "#2D6A4F", pesticide: "#E9A319", herbicide: "#6B4226", equipment: "#1A759F", fuel: "#1C2B1E" };
@@ -20,6 +20,7 @@ export default function InventoryPage() {
   const { inventory: INVENTORY } = useFarm();
   const [cat, setCat] = useState<(typeof CATS)[number]>("all");
   const [add, setAdd] = useState(false);
+  const [editing, setEditing] = useState<any>(null);
   const items = INVENTORY.filter((i) => cat === "all" || i.category === cat);
   const low = INVENTORY.filter((i) => i.quantity <= i.low_stock_threshold);
 
@@ -64,7 +65,7 @@ export default function InventoryPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs uppercase text-brand-charcoal/45">
-                {[lang === "sq" ? "Artikulli" : "Item", lang === "sq" ? "Sasia" : "Qty", lang === "sq" ? "Blerë" : "Bought", lang === "sq" ? "Kosto" : "Cost", lang === "sq" ? "Furnizuesi" : "Supplier", lang === "sq" ? "Skadon" : "Expiry"].map((h) => <th key={h} className="px-4 py-2 font-medium">{h}</th>)}
+                {[lang === "sq" ? "Artikulli" : "Item", lang === "sq" ? "Sasia" : "Qty", lang === "sq" ? "Blerë" : "Bought", lang === "sq" ? "Kosto" : "Cost", lang === "sq" ? "Furnizuesi" : "Supplier", lang === "sq" ? "Skadon" : "Expiry", ""].map((h, hi) => <th key={hi} className="px-4 py-2 font-medium">{h}</th>)}
               </tr>
             </thead>
             <tbody>
@@ -84,6 +85,7 @@ export default function InventoryPage() {
                     <td className="px-4 py-3 tabular-nums">{fmtEur(i.purchase_price_eur)}</td>
                     <td className="px-4 py-3 text-brand-charcoal/55">{i.supplier}</td>
                     <td className="px-4 py-3 text-brand-charcoal/55">{i.expiry_date ? fmtDateSq(i.expiry_date) : "—"}</td>
+                    <td className="px-4 py-3 text-right"><button onClick={() => setEditing(i)} className="rounded-lg p-1.5 text-brand-charcoal/40 hover:bg-zebra hover:text-brand-green" aria-label="Edit"><Pencil className="h-4 w-4" /></button></td>
                   </tr>
                 );
               })}
@@ -99,7 +101,7 @@ export default function InventoryPage() {
       </>
       )}
 
-      <AddInventoryModal open={add} onClose={() => setAdd(false)} />
+      <AddInventoryModal key={editing?.id ?? "new"} open={add || !!editing} editing={editing ?? undefined} onClose={() => { setAdd(false); setEditing(null); }} />
     </div>
   );
 }
