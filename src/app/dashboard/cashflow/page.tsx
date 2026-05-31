@@ -4,15 +4,14 @@ import { useApp } from "@/lib/store";
 import { useFarm } from "@/components/DataProvider";
 import { PageHeader, Card, CardHeader, Badge, HelpNote } from "@/components/ui/primitives";
 import { CashFlowChart } from "@/components/charts";
-import { cropById, cropName } from "@/lib/data/crops";
-import { MARKET_PRICES } from "@/lib/data/demo";
+import { cropById, cropName, referencePrice } from "@/lib/data/crops";
 import { fmtEur, cn } from "@/lib/utils";
 import { monthShortSq, monthNameSq, fmtDateSq } from "@/lib/dates";
 
 export default function CashflowPage() {
   const { lang } = useApp();
   const farm = useFarm();
-  const priceOf = (id: string) => farm.prices[id]?.price ?? MARKET_PRICES.find((m) => m.crop_id === id)?.price_eur_kg ?? cropById(id)?.market_price_eur_kg ?? 0;
+  const priceOf = (id: string) => farm.prices[id]?.price ?? referencePrice(id);
 
   // Build a 9-month window: 3 past → 6 future, keyed by year-month.
   const now = new Date();

@@ -5,8 +5,7 @@ import { useApp } from "@/lib/store";
 import { useFarm } from "@/components/DataProvider";
 import { PageHeader, Card, Badge, EmptyState, HelpNote } from "@/components/ui/primitives";
 import { AddListingModal } from "@/components/AddModals";
-import { MARKET_PRICES } from "@/lib/data/demo";
-import { cropById, cropName } from "@/lib/data/crops";
+import { cropById, cropName, referencePrice } from "@/lib/data/crops";
 import { fmtEur, fmtNum, cn } from "@/lib/utils";
 import { Plus, Pencil, TrendingUp } from "lucide-react";
 
@@ -16,7 +15,7 @@ export default function SellPage() {
   const [add, setAdd] = useState(false);
   const [editing, setEditing] = useState<any>(null);
 
-  const priceOf = (id: string) => farm.prices[id]?.price ?? MARKET_PRICES.find((m) => m.crop_id === id)?.price_eur_kg ?? cropById(id)?.market_price_eur_kg ?? 0;
+  const priceOf = (id: string) => farm.prices[id]?.price ?? referencePrice(id);
 
   const rows = farm.listings.map((l) => {
     const crop = cropById(l.crop_id)!;

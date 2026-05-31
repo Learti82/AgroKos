@@ -4,8 +4,7 @@ import { useApp } from "@/lib/store";
 import { useFarm } from "@/components/DataProvider";
 import { PageHeader, Card, CardHeader, Badge, EmptyState, HelpNote } from "@/components/ui/primitives";
 import { SpendBarChart } from "@/components/charts";
-import { cropById, cropName } from "@/lib/data/crops";
-import { MARKET_PRICES } from "@/lib/data/demo";
+import { cropById, cropName, referencePrice } from "@/lib/data/crops";
 import { fmtEur, fmtNum, fmtHa, cn } from "@/lib/utils";
 
 export default function ProfitPage() {
@@ -13,7 +12,7 @@ export default function ProfitPage() {
   const farm = useFarm();
 
   const priceOf = (cropId: string) =>
-    farm.prices[cropId]?.price ?? MARKET_PRICES.find((m) => m.crop_id === cropId)?.price_eur_kg ?? cropById(cropId)?.market_price_eur_kg ?? 0;
+    farm.prices[cropId]?.price ?? referencePrice(cropId);
 
   const rows = farm.plantings
     .filter((p) => p.status === "active" || p.status === "harvested")

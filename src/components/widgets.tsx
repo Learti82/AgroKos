@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useApp } from "@/lib/store";
 import { wmo, type ForecastResponse } from "@/lib/weather";
 import { ACTIVITY_LABELS } from "@/lib/i18n";
-import { cropById, cropName } from "@/lib/data/crops";
-import { MARKET_PRICES } from "@/lib/data/demo";
+import { cropById, cropName, CROPS, referencePrice } from "@/lib/data/crops";
 import { useFarm } from "@/components/DataProvider";
 import type { Activity, Alert } from "@/lib/types";
 import { Badge } from "@/components/ui/primitives";
@@ -112,27 +111,23 @@ export function ForecastStrip({ data }: { data: ForecastResponse }) {
 
 export function MarketMini() {
   const { lang } = useApp();
-  const top = [...MARKET_PRICES].sort((a, b) => Math.abs(b.pct_change_week) - Math.abs(a.pct_change_week)).slice(0, 5);
+  const { prices } = useFarm();
+  // Show the farmer's real entered prices first; otherwise a few references.
+  const realIds = Object.keys(prices);
+  const ids = (realIds.length ? realIds : CROPS.slice(0, 5).map((c) => c.id)).slice(0, 5);
   return (
     <table className="w-full text-sm">
       <tbody>
-        {top.map((m, i) => {
-          const crop = cropById(m.crop_id)!;
-          const Icon = m.trend === "up" ? TrendingUp : m.trend === "down" ? TrendingDown : Minus;
-          const tone = m.trend === "up" ? "text-brand-green" : m.trend === "down" ? "text-red-600" : "text-brand-charcoal/40";
+        {ids.map((id, i) => {
+          const crop = cropById(id);
+          if (!crop) return null;
+          const real = prices[id];
+          const price = real ? real.price : referencePrice(id);
           return (
-            <tr key={m.crop_id} className={cn(i % 2 === 1 && "bg-zebra")}>
-              <td className="py-1.5 pl-2">
-                <span className="mr-1.5">{crop.icon_emoji}</span>
-                {cropName(crop.id, lang)}
-              </td>
-              <td className="py-1.5 text-right font-semibold tabular-nums">{fmtEur(m.price_eur_kg)}</td>
-              <td className={cn("py-1.5 pr-2 text-right", tone)}>
-                <span className="inline-flex items-center gap-0.5 tabular-nums">
-                  <Icon className="h-3.5 w-3.5" />
-                  {Math.abs(m.pct_change_week)}%
-                </span>
-              </td>
+            <tr key={id} className={cn(i % 2 === 1 && "bg-zebra")}>
+              <td className="py-1.5 pl-2"><span className="mr-1.5">{crop.icon_emoji}</span>{cropName(crop.id, lang)}</td>
+              <td className={cn("py-1.5 text-right font-semibold tabular-nums", !real && "text-brand-charcoal/40")}>{fmtEur(price)}</td>
+              <td className="py-1.5 pr-2 text-right">{real ? <span className="text-[10px] font-medium text-brand-green">{lang === "sq" ? "reale" : "real"}</span> : <span className="text-[10px] text-brand-charcoal/35">{lang === "sq" ? "ref." : "ref."}</span>}</td>
             </tr>
           );
         })}

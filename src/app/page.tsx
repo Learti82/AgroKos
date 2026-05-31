@@ -3,10 +3,10 @@ import { Logo } from "@/components/ui/Logo";
 import { CROPS } from "@/lib/data/crops";
 import {
   Map, CloudSun, HandHelping, TrendingUp, FlaskConical, ClipboardList,
-  ArrowRight, Check, Star,
+  ArrowRight, Check,
 } from "lucide-react";
 
-// Real, royalty-free photography (Unsplash CDN) + real faces (pravatar).
+// Real, royalty-free photography (Unsplash CDN).
 const IMG = {
   hero: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1400&q=70",
   field: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=70",
@@ -28,12 +28,6 @@ const STORY = [
   { img: IMG.land, tag: "Fushat", title: "Të gjitha fushat në një hartë", desc: "Vizato kufijtë e fushave, ndiq kulturën aktuale dhe shëndetin e secilës parcelë. Sipërfaqja llogaritet automatikisht — pa metër, pa letra.", points: ["Hartë interaktive e fushave", "Sipërfaqja automatike në hektarë", "Statusi i shëndetit me ngjyra"] },
   { img: IMG.weather, tag: "Moti", title: "Moti i Kosovës, fushë për fushë", desc: "Parashikim 7-ditor për çdo komunë dhe parcelë, me paralajmërime automatike për ngrica e thatësirë dhe dritare optimale spërkatjeje.", points: ["Parashikim për koordinatat e fushës", "Alarme ngrice & thatësire", "Sugjerime për ujitje dhe spërkatje"] },
   { img: IMG.market, tag: "Tregu", title: "Shit kur çmimi është më i mirë", desc: "Ndiq çmimet e kulturave në tregjet kryesore të Kosovës, shiko trendet 12-mujore dhe merr këshillë kur është koha e duhur për shitje.", points: ["Çmime për 17 kultura", "Histori 12-mujore", "Këshilltar i kohës së shitjes"] },
-];
-
-const TESTIMONIALS = [
-  { name: "Agron Berisha", place: "Pejë", img: "https://i.pravatar.cc/120?img=12", quote: "Me AgroKos kam ulur shpenzimet e plehrave 20% dhe e di saktë kur të ujis domatet." },
-  { name: "Vlora Gashi", place: "Rahovec", img: "https://i.pravatar.cc/120?img=47", quote: "Paralajmërimi i ngricës më shpëtoi pemishten e mollëve vjet. Vlen çdo cent." },
-  { name: "Bekim Krasniqi", place: "Prizren", img: "https://i.pravatar.cc/120?img=33", quote: "Çmimet e tregut në një vend — tani shes mjedrën kur çmimi është më i lartë." },
 ];
 
 const STATS = [
@@ -86,17 +80,10 @@ export default function Landing() {
             </Link>
             <Link href="/dashboard" className="btn-secondary px-6 py-3 text-base">Shiko Demo</Link>
           </div>
-          <div className="mt-7 flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {TESTIMONIALS.map((t) => (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img key={t.name} src={t.img} alt={t.name} className="h-9 w-9 rounded-full border-2 border-brand-cream object-cover" />
-              ))}
-            </div>
-            <div className="text-sm">
-              <div className="flex text-brand-amber">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-3.5 w-3.5 fill-current" />)}</div>
-              <p className="text-brand-charcoal/55">Të besuar nga fermerë në mbarë Kosovën</p>
-            </div>
+          <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-sm text-brand-charcoal/65">
+            <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-brand-green" /> Mot real & live</span>
+            <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-brand-green" /> Asistent AI në shqip</span>
+            <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-brand-green" /> Të dhënat e tua, private</span>
           </div>
         </div>
 
@@ -199,22 +186,19 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Why AgroKos */}
       <section className="mx-auto max-w-7xl px-4 py-20 lg:px-8">
-        <h2 className="text-center font-display text-3xl font-semibold text-brand-charcoal">Çfarë thonë fermerët</h2>
+        <h2 className="text-center font-display text-3xl font-semibold text-brand-charcoal">Pse AgroKos</h2>
         <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <div key={t.name} className="card flex flex-col p-6">
-              <div className="mb-3 flex text-brand-amber">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}</div>
-              <p className="flex-1 text-brand-charcoal/80">“{t.quote}”</p>
-              <div className="mt-5 flex items-center gap-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={t.img} alt={t.name} className="h-11 w-11 rounded-full object-cover" />
-                <div>
-                  <p className="text-sm font-semibold text-brand-charcoal">{t.name}</p>
-                  <p className="text-xs text-brand-charcoal/50">{t.place}</p>
-                </div>
-              </div>
+          {[
+            { icon: "🇽🇰", title: "Ndërtuar për Kosovën", desc: "Kultura, klimë, komuna dhe çmime të Kosovës — gjithçka në shqip." },
+            { icon: "🔒", title: "Të dhënat e tua, private", desc: "Çdo fermë ka të dhënat e veta, të mbrojtura. Pa të dhëna të rreme." },
+            { icon: "🤖", title: "Inteligjencë reale", desc: "Mot live nga Open-Meteo dhe një asistent agronomik me AI që njeh fushat e tua." },
+          ].map((c) => (
+            <div key={c.title} className="card p-6 text-center">
+              <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-brand-lime/50 text-2xl">{c.icon}</div>
+              <h3 className="font-semibold text-brand-charcoal">{c.title}</h3>
+              <p className="mt-1.5 text-sm text-brand-charcoal/60">{c.desc}</p>
             </div>
           ))}
         </div>

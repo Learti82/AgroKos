@@ -39,7 +39,7 @@ export default function ExportPage() {
 
       <HelpNote>
         {lang === "sq"
-          ? "Lista e dokumenteve dhe standardeve për eksport në BE sipas kategorisë, plus një gjenerues etikete me Qthe QR për gjurmueshmërinë e lotit. Blerësit/supermarketet e BE-së e kërkojnë gjurmueshmërinë — skanimi i QR tregon origjinën dhe lotin."
+          ? "Lista e dokumenteve dhe standardeve për eksport në BE sipas kategorisë, plus një gjenerues etikete me QR për gjurmueshmërinë e lotit. Blerësit/supermarketet e BE-së e kërkojnë gjurmueshmërinë — skanimi i QR tregon origjinën dhe lotin."
           : "Document & standards checklist for EU export by category, plus a QR batch-label generator for traceability. EU buyers/supermarkets require traceability — scanning the QR shows the origin and lot."}
       </HelpNote>
 

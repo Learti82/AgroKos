@@ -1,4 +1,3 @@
-import { MARKET_PRICES } from "@/lib/data/demo";
 import { cropById } from "@/lib/data/crops";
 import { daysAgo } from "@/lib/dates";
 import type { FarmData } from "@/lib/data/farm";
@@ -27,7 +26,7 @@ export function estimatedRevenue(d: FarmData): number {
     const crop = cropById(p.crop_id);
     const field = d.fields.find((f) => f.id === p.field_id);
     if (!crop || !field) continue;
-    const price = MARKET_PRICES.find((m) => m.crop_id === crop.id)?.price_eur_kg ?? crop.market_price_eur_kg;
+    const price = d.prices[crop.id]?.price ?? crop.market_price_eur_kg;
     total += crop.avg_yield_kg_ha * field.area_ha * price;
   }
   return Math.round(total);

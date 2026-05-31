@@ -175,24 +175,13 @@ function Subsidies({ lang }: { lang: "sq" | "en" }) {
         <input type="checkbox" defaultChecked className="h-5 w-9 cursor-pointer appearance-none rounded-full bg-line transition checked:bg-brand-green relative before:absolute before:left-0.5 before:top-0.5 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition checked:before:translate-x-4" />
       </div>
       {SUBSIDIES.map((s) => (
-        <Card key={s.title} className={cn("border-l-4", s.status === "open" ? "border-brand-green" : s.status === "soon" ? "border-brand-amber" : "border-line opacity-70")}>
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h3 className="font-semibold text-brand-charcoal">{s.title}</h3>
-              <p className="mt-0.5 text-xs text-brand-charcoal/50">{s.crops}</p>
-            </div>
-            <Badge tone={s.status === "open" ? "good" : s.status === "soon" ? "warning" : "neutral"}>
-              {s.status === "open" ? (lang === "sq" ? "Hapur" : "Open") : s.status === "soon" ? (lang === "sq" ? "Së shpejti" : "Soon") : (lang === "sq" ? "Mbyllur" : "Closed")}
-            </Badge>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-4 text-sm">
-            <span><span className="text-brand-charcoal/45">{lang === "sq" ? "Vlera" : "Amount"}:</span> <strong className="text-brand-green">{s.amount}</strong></span>
-            <span><span className="text-brand-charcoal/45">{lang === "sq" ? "Afati" : "Deadline"}:</span> <strong>{s.deadline}</strong></span>
-          </div>
+        <Card key={s.title} className="border-l-4 border-brand-green">
+          <h3 className="font-semibold text-brand-charcoal">{s.title}</h3>
+          <p className="mt-0.5 text-xs text-brand-charcoal/50">{s.crops}</p>
           <p className="mt-2 text-sm text-brand-charcoal/70">📝 {s.how}</p>
         </Card>
       ))}
-      <p className="text-center text-xs text-brand-charcoal/40">{lang === "sq" ? "Burimi: MBPZHR / AZHB — të dhëna ilustruese." : "Source: MBPZHR / AZHB — illustrative data."}</p>
+      <p className="text-center text-xs text-brand-charcoal/45">{lang === "sq" ? "Shumat & afatet zyrtare: " : "Official amounts & deadlines: "}<a href="https://azhb-rks.net" target="_blank" rel="noreferrer" className="font-semibold text-brand-green hover:underline">azhb-rks.net</a></p>
     </div>
   );
 }

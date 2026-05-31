@@ -29,3 +29,8 @@ export const cropName = (id: string | null | undefined, lang: "sq" | "en"): stri
   if (!c) return lang === "sq" ? "—" : "—";
   return lang === "sq" ? c.name_sq : c.name_en;
 };
+
+/** Reference (default) price for a crop — an approximate figure used only as a
+ *  fallback estimate until the farmer enters real market prices. */
+export const referencePrice = (id: string | null | undefined): number =>
+  cropById(id)?.market_price_eur_kg ?? 0;

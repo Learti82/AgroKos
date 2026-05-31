@@ -23,19 +23,21 @@ export const ROTATION_NEXT: Record<string, { good: string[]; avoid: string[]; re
 
 export interface Subsidy {
   title: string;
-  amount: string;
-  deadline: string;
   crops: string;
+  categories: string[]; // crop categories + "dairy"/"bees" for matching
   how: string;
-  status: "open" | "soon" | "closed";
 }
 
+// General areas where Kosovo's Ministry of Agriculture (MBPZHR/AZHB)
+// typically offers support. NO fabricated amounts/deadlines — those change
+// every call and must be read from the official source (azhb-rks.net).
 export const SUBSIDIES: Subsidy[] = [
-  { title: "Subvencion për grurë dhe drithëra", amount: "€220/ha", deadline: "30 Qershor", crops: "Grurë, elb, misër", how: "Aplikim në AZHB me fletën kadastrale dhe dëshminë e mbjelljes.", status: "open" },
-  { title: "Mbështetje për pemtari intensive", amount: "deri €3.000/ha", deadline: "15 Korrik", crops: "Mollë, kumbull, dredhëza", how: "Projekt-propozim + faturat e fidanëve dhe sistemit të ujitjes.", status: "open" },
-  { title: "Grant për serra dhe perimtari", amount: "50% e investimit", deadline: "1 Shtator", crops: "Domate, speca, kastravec", how: "Aplikim përmes thirrjes IADK/MBPZHR me plan biznesi.", status: "soon" },
-  { title: "Subvencion për lopë qumështore", amount: "€100/krerë", deadline: "31 Maj", crops: "Bulmet", how: "Regjistrim i kafshëve në AVUK + numri i identifikimit.", status: "closed" },
-  { title: "Mbështetje për bletari", amount: "€20/koshere", deadline: "20 Qershor", crops: "Mjaltë", how: "Dëshmi e numrit të koshereve nga shoqata e bletarëve.", status: "open" },
+  { title: "Drithëra (grurë, misër, elb)", crops: "Grurë, misër, elb", categories: ["cereal"], how: "Mbështetje për sipërfaqe të mbjella. Aplikohet pranë AZHB gjatë thirrjes vjetore me fletën kadastrale." },
+  { title: "Perimtari & serra", crops: "Domate, speca, kastravec", categories: ["vegetable"], how: "Grante për serra dhe inpute, përmes thirrjeve MBPZHR/IADK me plan biznesi." },
+  { title: "Pemtari & vreshtari", crops: "Mollë, kumbull, rrush", categories: ["fruit"], how: "Mbështetje për ngritje pemishtesh dhe sisteme ujitjeje." },
+  { title: "Manaferra", crops: "Mjedër, boronicë, luleshtrydhe", categories: ["berry"], how: "Grante për kultura me vlerë të lartë dhe ftohje/ruajtje." },
+  { title: "Blegtori & bulmet", crops: "Lopë qumështore", categories: ["dairy"], how: "Subvencion për krerë dhe qumësht; kërkon regjistrim të kafshëve në AVUK." },
+  { title: "Bletari", crops: "Mjaltë", categories: ["bees"], how: "Mbështetje për koshere, zakonisht përmes shoqatave të bletarëve." },
 ];
 
 export interface ExportReq {
