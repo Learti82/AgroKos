@@ -15,6 +15,10 @@ export const DICT = {
   nav_inventory: { sq: "Inventari", en: "Inventory" },
   nav_advisory: { sq: "Këshillim", en: "Advisory" },
   nav_settings: { sq: "Cilësimet", en: "Settings" },
+  nav_assistant: { sq: "Asistenti AI", en: "AI Assistant" },
+  nav_diagnose: { sq: "Diagnoza", en: "Diagnose" },
+  nav_profit: { sq: "Fitimi", en: "Profit" },
+  nav_subsidies: { sq: "Subvencione", en: "Subsidies" },
 
   // Common
   loading: { sq: "Duke u ngarkuar…", en: "Loading…" },
